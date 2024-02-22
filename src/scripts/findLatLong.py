@@ -37,6 +37,3 @@ def replaceLatLong(path: str, file:str):
             os.remove(path+"old_"+file)
         os.rename(path+file,path+"old_"+file)
         data.to_csv(path+file, sep=";")
-
-replaceLatLong("in/data/","Fournisseurs.csv")
-replaceLatLong("in/data/","Établissements.csv")

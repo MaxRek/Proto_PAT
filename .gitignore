@@ -1,0 +1,5 @@
+in/data/old_*
+out/*
+src/__pycache__
+src/scripts/__pycache__
+src/entity/__pycache__
