@@ -1,0 +1,63 @@
+{
+    "Legumes" : 
+    {
+        "Pomme de terre": 760,
+        "Poireau" : 40,
+        "Carotte" : 230,
+        "Oignon" : 40,
+        "Navet" : 20,
+        "Chou": 10,
+        "Champignon" : 20,
+        "Salade" : 190,
+        "Tomate" : 10,
+        "Concombre" : 10,
+        "Courgette" : 7,
+        "Aubergine" : 3,
+        "Betterave" : 90,
+        "Botte de Radis" : 50   
+    },
+    "Fruits": 
+    {
+        "Pomme" : 380,
+        "Poire" : 380,
+        "Fraise" : 20,
+        "Melon" : 60,
+        "Pêche" : 230,
+        "Abricot" : 10,
+        "Raisin" : 40,
+        "Kiwi" : 200
+    },
+    "Laitages" :
+    {
+        "Lait" : 340,
+        "Fromage" : 10,
+        "Yaourt" : 60,
+        "Fromage blanc" : 300,
+        "Creme" : 20,
+        "Flan Caramel" : 60 
+    },
+    "Viandes" :
+    {
+        "Bovine" : 380,
+        "Poulet" : 2400,
+        "Canard" : 380,
+        "Porc" : 380,
+        "Lapin" : 280,
+        "Cordon bleu" : 480,
+        "Dinde" : 1000,
+        "Jambon" : 190,
+        "Saucisse" : 5760,
+        "Chipolata" : 11530,
+        "Autres charcuteries" : 140,
+        "Poisson" : 280     
+    },
+    "Epicerie" :
+    {
+        "Pâte" : 480,
+        "Huile" : 280
+    },
+    "Legumineuses" :
+    {
+        "Lentilles" : 480
+    }
+}

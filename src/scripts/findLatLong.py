@@ -1,7 +1,6 @@
 import pandas as pd
 import numpy as np
 import urllib.parse
-import json
 import requests
 import os
 
@@ -14,7 +13,7 @@ import os
 # Met à jour selon la recherche via nominatim, n'est pas efficace à 100%
 
 def replaceLatLong(path: str, file:str):
-    data = pd.read_csv(path+file, sep = ";",na_values="NaN")
+    data = pd.read_csv(path+file+".csv", sep = ";",na_values="NaN")
     if not set(["x","y"]).issubset(data.columns):
         data["x"]= np.nan
         data["y"]= np.nan
@@ -33,7 +32,7 @@ def replaceLatLong(path: str, file:str):
     if data.shape[0] == len(failed_indexes):
         print("pas de modification")
     else:
-        if "old_"+file in os.listdir(path):
-            os.remove(path+"old_"+file)
-        os.rename(path+file,path+"old_"+file)
-        data.to_csv(path+file, sep=";")
+        if "old_"+file+".csv" in os.listdir(path):
+            os.remove(path+"old_"+file+".csv")
+        os.rename(path+file+".csv",path+"old_"+file+".csv")
+        data.to_csv(path+file+".csv", sep=";")
