@@ -1,10 +1,11 @@
-FIELDS_F = ["Nom","x","y"]
-FIELDS_E = ["Nom de la structure","x","y"]
+FIELDS_F = ["Nom","x","y","Commune"]
+FIELDS_E = ["Nom de la structure","x","y","Commune","Domaine"]
 PATH_DATA = "in/data/"
 PATH_FILE_F = "Fournisseurs"
 PATH_FILE_E = "Établissements"
 COLOR_PIN_F = "green"
 COLOR_PIN_E = "blue"
+DOMAINES = ["Education"]
 DEMAND = {
     "Legumes" : [
         "Aubergine","Betterave","Carotte","Champignon","Chou","Concombre","Courgette","Navet","Oignon","Poireau","Pomme de terre","Botte de Radis","Salade","Tomate"

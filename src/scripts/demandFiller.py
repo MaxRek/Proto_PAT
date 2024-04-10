@@ -3,7 +3,7 @@ import numpy as np
 import copy
 import json
 import os
-from src.constant import SUB_DEMAND,COMMUNES
+from src.constant import SUB_DEMAND,COMMUNES,DOMAINES
 
 def rowDemandFiller(nbrp : int, quantities : list[int]) -> np.array:
     return nbrp*np.array(quantities)/100
@@ -67,7 +67,7 @@ def demandFiller(path : str, file : str):
     else:
         print("Erreur : Key dans SUB_DEMAND \""+key+"\" n'est pas référencé dans les quantités.")
 
-    demand = data[columns].loc[(
+    demand = data[columns].loc[(data["Domaine"].isin(DOMAINES)) &(
         (data["Type de restauration"] == "Production et consommation sur place") |
         (data["Type de restauration"] == "Production pour consommation sur place et livraisons à des restaurants satellites")|
         (data["Type de restauration"] == "Production pour livraisons à des restaurants satellites"))
