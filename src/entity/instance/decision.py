@@ -12,7 +12,7 @@ class Dec:
     AFS:np.matrix
     T:list
 
-    def __init__(self, c:int, n:int, p:int, k:int, f:int, f_p:int) -> None:
+    def __init__(self, c:int, n:int, p:int, k:int, f:int, fs:int, fp:int) -> None:
         
         #x_{i,j}^k
         self.xnc = list()
@@ -45,7 +45,7 @@ class Dec:
         self.AFS = np.zeros((k,f))
 
         #T_{f,f'}^n
-        self.T = np.zeros((n,f_p))
+        self.T = np.zeros((n,fp))
 
 
 
