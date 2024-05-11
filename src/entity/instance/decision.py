@@ -1,4 +1,5 @@
 import numpy as np
+import json
 
 class Dec:
 
@@ -47,6 +48,8 @@ class Dec:
         #T_{f,f'}^n
         self.T = np.zeros((n,fp))
 
+    def save_dec(self, path:str, name:str):
+        joblib.dump()
 
 
     def print_x(self):
@@ -110,6 +113,8 @@ class Dec:
         self.print_x()
         print("°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°")
         self.print_T()
+
+        
 
 
 

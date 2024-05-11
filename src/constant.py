@@ -1,8 +1,14 @@
 FIELDS_F = ["Nom","x","y","Commune"]
 FIELDS_E = ["Nom de la structure","x","y","Commune","Domaine"]
-PATH_DATA = "in/data/"
+FIELDS_N = ["Nom de la structure","Commune","x","y"]
+
+PATH_IN = "in/"
+PATH_DATA = "data/"
+PATH_INSTANCE = "instance/"
 PATH_FILE_F = "Fournisseurs"
 PATH_FILE_E = "Établissements"
+PATH_FILE_N = "Entrepots"
+
 COLOR_PIN_F = "green"
 COLOR_PIN_E = "blue"
 DOMAINES = ["Education"]

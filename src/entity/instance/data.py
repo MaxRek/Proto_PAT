@@ -16,7 +16,7 @@ class Data:
     t:np.matrix
 
     def __init__(self, n:int,c:int,p:int,k:int,f:int,fp:int,fs:int,q:int,o:list,d:np.matrix,S:np.matrix,ct:np.matrix,t:np.matrix) -> None:
-        if len(o) != n and len(d) != c and len(d[0]) != f and len(S) != p and len(t) != n and len(t[0]) != fs and fp < fs :
+        # if len(o) != n and len(d) != c and len(d[0]) != f and len(S) != p and len(t) != n and len(t[0]) != fs and fp < fs :
             self.N = n
             self.C = c
             self.P = p
@@ -30,6 +30,22 @@ class Data:
             self.S = S
             self.c = ct
             self.t = t
-        else:
-            print("Erreur d'initialisation, problème impossible")
+        # else:
+        #     print("Erreur d'initialisation, problème impossible")
         
+    def save_data(self, path, name):
+        writer = open(path+name+".txt",'w')
+        writer.write(str(self.N)+"\n")
+        writer.write(str(self.C)+"\n")
+        writer.write(str(self.P)+"\n")
+        writer.write(str(self.K)+"\n")
+        writer.write(str(self.F)+"\n")
+        writer.write(str(self.Fs)+"\n")
+        writer.write(str(self.Fp)+"\n")
+        writer.write(str(self.Q)+"\n")
+        writer.write(str(self.O)+"\n")
+        writer.write(str(self.d.tolist())+"\n")
+        writer.write(str(self.S.tolist())+"\n")
+        writer.write(str(self.c.tolist())+"\n")
+        writer.write(str(self.t.tolist()))
+        writer.close()

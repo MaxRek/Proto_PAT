@@ -15,6 +15,7 @@ class Aff:
     location:tuple
     z_start:float
     df:Df
+    roads:list
 
     def __init__(self, loc:tuple, z_st:float):
         self.df = Df()
