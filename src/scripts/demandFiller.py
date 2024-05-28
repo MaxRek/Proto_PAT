@@ -5,7 +5,7 @@ import copy
 import json
 import os
 import random
-from src.constant import SUB_DEMAND,COMMUNES,DOMAINES,SUB_FIELDS_E,FIELDS_F,FIELDS_D
+from src.constant import COUT_METRE_CARRE,NB_METRE_CARRE,ECART_PRIX_PLAT,RATIO_AMORTISSEMENT,SUB_DEMAND,COMMUNES,DOMAINES,SUB_FIELDS_E,FIELDS_F,FIELDS_D
 
 def rowDemandFiller(nbrp : int, quantities : list[int]) -> np.array:
     return nbrp*np.array(quantities)/100
@@ -221,21 +221,20 @@ def demandFiller_Dcpf(path : str, file_e : str, file_p : str, file_d : str,mult:
     #print(demand.columns)
     #print(F)
     
-    data_p = pd.read_csv(path+file_p+".csv", sep = ";",na_values="NaN",usecols= FIELDS_F)
+    data_p = pd.read_csv(path+file_p+".csv", sep = ";",na_values="NaN")
     
-    if D == []:
-        if(len(ratio_p) != len(pos_SUB_DEMAND_key)):
-            print("ratio_p n'est pas représentatif des filières à traiter (len(ratio_p) = "+str(len(ratio_p))+" , len(demand_key) = "+str(len(pos_SUB_DEMAND_key))+"), séparation égale pour chaque filière")
-            r = 1/len(pos_SUB_DEMAND_key)
-            ratio_p = np.ones(len(pos_SUB_DEMAND_key)).tolist()
-            for i in range(len(ratio_p)):
-                ratio_p[i] = ratio_p[i]*r
-
-        #print(ratio_p)
-
-    A = []
     #Affectation alétoire aux filières
     if "Filieres" not in data_p.columns:
+        data_p = data_p[FIELDS_F]
+        if D == []:
+            if(len(ratio_p) != len(pos_SUB_DEMAND_key)):
+                print("ratio_p n'est pas représentatif des filières à traiter (len(ratio_p) = "+str(len(ratio_p))+" , len(demand_key) = "+str(len(pos_SUB_DEMAND_key))+"), séparation égale pour chaque filière")
+                r = 1/len(pos_SUB_DEMAND_key)
+                ratio_p = np.ones(len(pos_SUB_DEMAND_key)).tolist()
+                for i in range(len(ratio_p)):
+                    ratio_p[i] = ratio_p[i]*r
+
+        #print(ratio_p)
         affect = []
         ind_f_p = []
         for i in range(len(prod.keys())):
@@ -276,9 +275,9 @@ def demandFiller_Dcpf(path : str, file_e : str, file_p : str, file_d : str,mult:
             
         data_p["Filieres"] = affect
         # print(data_p["Filieres"])
-        data_p.to_csv(path+file_p+".csv", sep = ";")
+        data_p.to_csv(path+file_p+"_prod.csv", sep = ";")
     else:
-
+        data_p = data_p[copy.copy(FIELDS_F).append("Filieres")]
         ind_f_p = []
         for i in range(len(prod.keys())):
             ind_f_p.append([])
@@ -288,7 +287,7 @@ def demandFiller_Dcpf(path : str, file_e : str, file_p : str, file_d : str,mult:
         
             for key in prod.keys():
                 #sum_ind_p_f.append[[]]
-                if key in data_p.loc[i]["Filieres"]:
+                if key in data_p.iloc[i]["Filieres"]:
                     # print(key)
                     # print(data_p.loc[i]["Filieres"])
                     ind_f_p[j].append(i)
@@ -304,34 +303,45 @@ def demandFiller_Dcpf(path : str, file_e : str, file_p : str, file_d : str,mult:
     if ratio_pc == []:
         print("ratio_pc non spécifié, le client se fournit chez un producteur par filière")
         ratio_pc = np.ones(len(pos_SUB_DEMAND_key),dtype=int).tolist()
-    
+    #print(ind_f_p)
+
     #Pour chaque etablissement
     for e in range(demand.shape[0]):
-        #Pour chaque filière de produit
-        for f in range(len(ratio_pc)):
+        temp_ratio_pc = np.zeros(len(pos_SUB_DEMAND_key),dtype=int).tolist()
+        while(temp_ratio_pc != ratio_pc):
+        #On choisit une filière de produit
+            
+            f = randinlist(ratio_pc)
+            f = f[0]
+            #print("ratio_pc = "+str(ratio_pc)+" ,f = "+str(f))
+            temp_d = []
             temp_f = []
             temp_p = []
-            fill_f = np.zeros(len(ratio_pc))
 
             #verifier si il y a une demande pour le produit, et que la demande n'est pas déjà remplie
-            if demand.iloc[e][list(prod.keys())[f]] > 0 and fill_f[f]< ratio_pc[f]:
+            if demand.iloc[e][list(prod.keys())[f]] > 0 and temp_ratio_pc[f] < ratio_pc[f]:
                 #Ajoutez autant de prod que nécéssaire, coupez la commande en nombre de prods
                 #Relancez si prod déjà pris
-                count = 0 
-                while count < ratio_pc[f]:
-                    k = randinlist(ind_f_p)[0]
+                while temp_ratio_pc[f] < ratio_pc[f]:
+                    #print(ind_f_p[f])
+                    
+                    k = randinlist(ind_f_p[f])[0]
+                    #print(k)
                     if k not in temp_p :
-                        temp_p.append(k)
-                        count += 1
-                        temp_f.append(demand.iloc[e][list(prod.keys())[f]]/ratio_pc[f])
+                        temp_p.append(ind_f_p[f][k])
+                        temp_ratio_pc[f] += 1
+                        temp_f.append(f)
+                        temp_d.append(demand.iloc[e][list(prod.keys())[f]]/ratio_pc[f])
                         #On vérifie si le prod ne produit pas d'autres filières, si oui on associe directement s'il ya une place à remplir
                         for j in range(len(ratio_pc)):
                             if j != f:
-                                if(k in ind_f_p[j]) and fill_f[j] < ratio_pc[j]:
-                                    temp_p.append(k)
-                                    count += 1
-                                    temp_f.append(demand.iloc[e][list(prod.keys())[j]]/ratio_pc[j])
-                for i in range(ratio_pc[f]):
+                                if(k in ind_f_p[j]) and temp_ratio_pc[j] < ratio_pc[j]:
+                                    #print(ind_f_p[j])
+                                    temp_p.append(ind_f_p[f][k])
+                                    temp_ratio_pc[j] += 1
+                                    temp_f.append(j)
+                                    temp_d.append(demand.iloc[e][list(prod.keys())[j]]/ratio_pc[j])
+                for i in range(len(temp_p)):
                     # print("_________________")
                     # print(data_p.loc[temp_p[i]])
                     # print("_________________")  
@@ -339,7 +349,7 @@ def demandFiller_Dcpf(path : str, file_e : str, file_p : str, file_d : str,mult:
                     # print("_________________")
                     # print(temp_f[i])
 
-                    values_ind = [e,temp_p[i],f,temp_f[i]]
+                    values_ind = [e,temp_p[i],temp_f[i],temp_d[i]]
                     r_ind = pd.DataFrame([values_ind] ,columns = ["E","P","F","d"])
                     # values = [data_e.loc[e]["Nom de la structure"],data_p.loc[temp_p[i]]["Nom"],list(prod.keys())[f],temp_f[i]]
 
@@ -348,11 +358,10 @@ def demandFiller_Dcpf(path : str, file_e : str, file_p : str, file_d : str,mult:
                 d = pd.concat([r_ind,d], ignore_index=True)
                 # d = pd.concat([r,d], ignore_index=True)
 
-    print(d)
+    #print(d)
 
-    print(demand.iloc[e])
+    #print(demand.iloc[e])
     d.to_csv(path+file_d+".csv",sep=";")
-    
 
 def randinlist( l : list, ratio :list = []):
     if ratio == []:
@@ -381,3 +390,11 @@ def randinlist( l : list, ratio :list = []):
             j += 1
 
     return i, sum_r
+
+def gen_O(N:int,prix_mc:float = COUT_METRE_CARRE,surface:int = NB_METRE_CARRE,ecart:float = ECART_PRIX_PLAT, ratio:float = RATIO_AMORTISSEMENT):
+    r = np.zeros(N).tolist()
+    for i in range(N):
+        r[i] = round((surface * ((prix_mc*(1-ecart))+prix_mc*ecart*random.random()*2))*ratio)
+
+    print(r)
+    return r

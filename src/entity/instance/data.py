@@ -1,11 +1,13 @@
 import numpy as np
 import openrouteservice
+import csv
 import os
 import requests
 import time
+import pandas as pd 
 from openrouteservice import convert
 from ..df import Df
-from src.constant import APIKEY_OPENROUTE, PATH_IN, PATH_INSTANCE, PRIX_ESSENCE_100_KM, TARIF_HORAIRE_HT
+from src.constant import APIKEY_OPENROUTE, PATH_IN, PATH_INSTANCE, PRIX_ESSENCE_100_KM, TARIF_HORAIRE_HT, FIELDS_D
 import math
 import ast
 
@@ -21,11 +23,11 @@ class Data:
     Q:int
     O:list
     D:list
-    d:list
+    d:dict
     c:list
     df:Df
 
-    def __init__(self, df:Df, n:int,c:int,p:int,t:int,k:int,f:int,fp:int,fs:int,q:int,o:list,D:list,d:list,ct:list) -> None:
+    def __init__(self, df:Df, n:int,c:int,p:int,t:int,k:int,f:int,fp:int,fs:int,q:int,o:list,D:list,d:dict,ct:list) -> None:
         # if len(o) != n and len(d) != c and len(d[0]) != f and len(S) != p and len(t) != n and len(t[0]) != fs and fp < fs :
             self.df = df
             self.N = n
@@ -45,7 +47,8 @@ class Data:
         #     print("Erreur d'initialisation, problème impossible")
         
     def save_data(self, path, name):
-        writer = open(path+name+".txt",'w')
+        print(self.Q)
+        writer = open(path+name+"/data.txt",'w')
         writer.write("N:"+str(self.N)+"\n")
         writer.write("C:"+str(self.C)+"\n")
         writer.write("P:"+str(self.P)+"\n")
@@ -57,10 +60,11 @@ class Data:
         writer.write("Q:"+str(self.Q)+"\n")
         writer.write("O:"+str(self.O)+"\n")
         writer.write("D:"+str(self.D)+"\n")
-        writer.write("d:"+str(self.d)+"\n")
         writer.write("c:"+str(self.c)+"\n")
         writer.close()
-        self.df.save_df(path,"e","f","n","t")
+        self.df.save_df(path+name+"/","e","f","n","t")
+        print(name)
+        self.save_d(name, "d")
 
     def load_data(self,path,name):
         if "data.txt" in os.listdir(path+"/"+name+"/"):
@@ -112,7 +116,53 @@ class Data:
         else:
             print("ERREUR : data.txt absent dans "+PATH_IN+"/"+PATH_INSTANCE+"/"+name+"/")
 
-    def load_c(self,key=APIKEY_OPENROUTE,rate_per_hour:float=1.0):
+    def load_Dd(self,name:str, file_d:str, path:str = PATH_IN+"/"+PATH_INSTANCE+"/"):
+        if file_d+".csv" in os.listdir(path+name+"/"):
+            self.d = {}
+            temp_d = pd.read_csv(path+name+"/"+file_d+".csv", sep=";", usecols= FIELDS_D)
+            self.D = np.zeros((self.C,self.P),dtype=int).tolist()
+            # print(str(self.C) + " " + str(self.P))
+            # print(str(temp_d.shape[0]) + " " + str(temp_d.shape[1]))
+            if temp_d.shape[0] > 0:
+                for row in temp_d.iterrows():
+                    r = row[1]
+                    # print(self.d.keys())
+                    #print(r)
+                    if r["E"] not in self.d.keys():
+                        self.d[r["E"]] = {}
+                    if r["P"] not in self.d[r["E"]].keys():
+                        self.d[r["E"]][r["P"]] = []
+                    self.d[int(r["E"])][int(r["P"])].append((int(r["F"]),r["d"]))
+                    self.D[int(r["E"])][int(r["P"])] = 1
+            #print(self.D)   
+        else:
+            print("Pas de fichier \""+file_d+".csv\" dans "+path+"/"+name)
+
+    def save_d(self,name:str, file_d:str, path:str = PATH_IN+"/"+PATH_INSTANCE+"/"):
+        # if file_d+".csv" in os.listdir(path+name+"/"):
+        #     os.remove(path+name+"/"+file_d+".csv")
+        temp_d = pd.DataFrame([],columns=["E","P","F","d"])
+
+        for key in self.d.keys():
+            for key2 in self.d[key].keys():
+                for values in self.d[key][key2]:
+                    #print(values)
+                    temp = [int(key), int(key2), int(values[0]), values[1]]
+                    r = pd.DataFrame([temp],columns=["E","P","F","d"])
+                    temp_d = pd.concat([temp_d,r])
+
+        temp_d.to_csv(path+name+"/"+file_d+".csv",sep = ";")
+
+    def print_d(self):
+        for key in self.d.keys():
+            print("client : "+str(key)+" avec commandes : ")
+            for key2 in self.d[key].keys():
+                string = ""
+                for value in self.d[key][key2]:
+                    string += "(Filière n"+str(value[0])+", qté = "+str(value[1])+")"
+                print("   Fournisseur n"+str(key2)+" filières : "+string )
+    
+    def gen_c(self,key=APIKEY_OPENROUTE,rate_per_hour:float=1.0):
         total = self.N+self.C+self.P
         self.c = np.zeros((total,total)).tolist()
         it = math.ceil(total/25)
