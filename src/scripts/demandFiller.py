@@ -341,11 +341,13 @@ def demandFiller_Dcpf(path : str, file_e : str, file_p : str, file_d : str,mult:
 
                     values_ind = [e,temp_p[i],f,temp_f[i]]
                     r_ind = pd.DataFrame([values_ind] ,columns = ["E","P","F","d"])
-                    values = [data_e.loc[e]["Nom de la structure"],data_p.loc[temp_p[i]]["Nom"],list(prod.keys())[f],temp_f[i]]
+                    # values = [data_e.loc[e]["Nom de la structure"],data_p.loc[temp_p[i]]["Nom"],list(prod.keys())[f],temp_f[i]]
 
-                    r = pd.DataFrame([values] ,columns = ["E","P","F","d"])
+                    # r = pd.DataFrame([values] ,columns = ["E","P","F","d"])
 
-                d = pd.concat([r_ind,r,d], ignore_index=True)
+                d = pd.concat([r_ind,d], ignore_index=True)
+                # d = pd.concat([r,d], ignore_index=True)
+
     print(d)
 
     print(demand.iloc[e])
