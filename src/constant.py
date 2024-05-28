@@ -1,16 +1,31 @@
-FIELDS_F = ["Nom","x","y","Commune"]
-FIELDS_E = ["Nom de la structure","x","y","Commune","Domaine"]
-FIELDS_N = ["Nom de la structure","Commune","x","y"]
+APIKEY_OPENROUTE = '5b3ce3597851110001cf62483df00dfb4ccb4e8c91dc5e03a8263482'
+PRIX_ESSENCE_100_KM = 7.5
+TARIF_HORAIRE_HT = 11.65
 
-PATH_IN = "in/"
-PATH_DATA = "data/"
-PATH_INSTANCE = "instance/"
+#Path
+PATH_IN = "in"
+PATH_DATA = "data"
+PATH_INSTANCE = "instance"
 PATH_FILE_F = "Fournisseurs"
 PATH_FILE_E = "Établissements"
 PATH_FILE_N = "Entrepots"
+PATH_FILE_T = "Transformateurs"
 
-COLOR_PIN_F = "green"
+
+#Dataframe
+FIELDS_F = ["Nom","x","y","Commune"]
+FIELDS_E = ["Nom de la structure","x","y","Nombre de repas par jour","Commune","Domaine","Type de restauration"]
+SUB_FIELDS_E = ["Nom de la structure","x","y","Nombre de repas par jour","Commune"]
+FIELDS_N = ["Nom de la structure","x","y","Commune"]
+FIELDS_T = ["Nom de la structure","x","y","Commune"]
+FIELDS_D = ["E","P","F","d"]
+
+#Affichage
+COLOR_PIN_F = "red"
 COLOR_PIN_E = "blue"
+COLOR_PIN_N = "black"
+COLOR_PIN_T = "green"
+
 DOMAINES = ["Education"]
 DEMAND = {
     "Legumes" : [

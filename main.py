@@ -11,4 +11,3 @@ from src.entity.aff import Aff
 # truc.add_point(truc.df)
 # truc.M.save("map.html")
 
-demandFiller(PATH_DATA,PATH_FILE_E)
