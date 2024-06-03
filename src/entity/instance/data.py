@@ -165,7 +165,7 @@ class Data:
                 print("   Fournisseur n"+str(key2)+" filières : "+string )
     
     def gen_c(self,key=APIKEY_OPENROUTE,rate_per_hour:float=1.0):
-        total = self.N+self.C+self.P
+        total = self.N+self.C+self.P+1
         self.c = np.zeros((total,total)).tolist()
         it = math.ceil(total/25)
         nbit = (it-1)+((it-2)*(it-1))/2
@@ -180,6 +180,9 @@ class Data:
             temp_coords.append((i[0],i[1]))
 
         for i in self.df.get_coords_F().values:
+            temp_coords.append((i[0],i[1]))
+
+        for i in self.df.get_coords_T().values:
             temp_coords.append((i[0],i[1]))
 
         it = math.ceil(total/25)
