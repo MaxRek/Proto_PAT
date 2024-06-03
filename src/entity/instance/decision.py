@@ -10,15 +10,20 @@ class Dec:
     y:list
     wc:list
     wp:list
-    wt:list
+    wt:int
+    wk:list
+    LnfPT:list
 
-    def __init__(self, c:int, n:int, p:int, t:int) -> None:
+    def __init__(self, c:int, n:int, p:int, t:int, f:int, k:int) -> None:
         
-        #x_{i,j}^k
-        self.xnc = np.zeros((n+c,n+c),dtype=int).tolist()
-        self.xnp = np.zeros((n+p+t,n+p+t),dtype=int).tolist()
-        
-        #xs
+        #x_{i,j}^n
+        self.xnc = []
+        self.xnp = []
+        for i in range(len(n)):
+            self.xnc.append(np.zeros((n+c,n+c),dtype=int).tolist())
+            self.xnp.append(np.zeros((n+p+1,n+p+1),dtype=int).tolist())
+
+        #xs^k_{i,j}
         self.xsnp = copy.copy(self.xnp)
 
         #y_n
@@ -31,7 +36,15 @@ class Dec:
         self.wp = np.zeros((p,n),dtype=int).tolist()
             
         #wt_{t,n}
-        self.wt = np.zeros((t,n),dtype=int).tolist()
+        self.wt = np.zeros(n,dtype=int).tolist()
+
+        #wk_{k,n}
+        self.wk = np.zeros((k,n),dtype=int).tolist()
+
+        #l^n_{f,PT}
+        self.LnfPT = []
+        for i in range(len(n)):
+            self.LnfPT.append(np.zeros((f,p+t)).tolist)()
 
     def load_dec(self, path:str, name:str):
         with(open(path+name+".json",'r')) as f:
@@ -44,6 +57,8 @@ class Dec:
         self.wc = loaded["wc"]
         self.wp = loaded["wp"]
         self.wt = loaded["wt"]
+        self.wk = loaded["wk"]
+        self.LnfPT = loaded["LnfPT"]
 
     def save_dec(self, path:str, name:str):
         to_write = dict()
@@ -51,10 +66,11 @@ class Dec:
         to_write["xnp"] = self.xnp
         to_write["xsnp"] = self.xsnp
         to_write["y"] = self.y
-
         to_write["wc"] = self.wc
         to_write["wp"] = self.wp
         to_write["wt"] = self.wt
+        to_write["wk"] = self.wk
+        to_write["LnfPT"] = self.LnfPT
 
         with(open(path+name+".json",'w')) as f:
             f.write(json.dumps(to_write,indent=4,sort_keys=True))

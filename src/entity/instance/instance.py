@@ -20,7 +20,7 @@ class Instance:
     def __init__(self, df:Df,K :int, F:int, Fs:int, Q : int, O:list, D:list, d:list, ct:np.matrix = np.zeros((1,1)),prod:dict = SUB_DEMAND ) -> None:
         self.prod = prod
         self.data= Data(df,df.N.shape[0], df.E.shape[0], df.F.shape[0], df.T.shape[0],K, F, F-Fs, Fs, Q,O,D,d,ct)
-        self.dec = Dec(self.data.C, self.data.N, self.data.P,self.data.T)
+        self.dec = Dec(self.data.C, self.data.N, self.data.P, self.data.T, self.data.F)
 
     def load_instance(self):
         if "prod.json" in os.listdir(PATH_IN+"/"+PATH_INSTANCE+"/"+self.name+"/"):
@@ -45,5 +45,3 @@ class Instance:
 
         self.data.save_data(PATH_IN+"/"+PATH_INSTANCE+"/",self.name)
         self.dec.save_dec(PATH_IN+"/"+PATH_INSTANCE+"/"+self.name+"/","dec")
-
-        
