@@ -51,6 +51,9 @@ class Df:
 
     def get_coords_F(self):
         return self.F[["y","x"]]
+    
+    def get_coords_T(self):
+        return self.T[["y","x"]]
 
     def get_coords(self):
         return [self.get_coords_N(),self.get_coords_E(),self.get_coords_F()]
