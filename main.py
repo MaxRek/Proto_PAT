@@ -30,16 +30,16 @@ ratio_pc = [2,1,1,1]
 instance = Instance(truc.df, 4,4,1,2500,[4,5,6,5],np.zeros(20).tolist(),np.zeros(20).tolist(),np.zeros(20).tolist(),prod=Prod)
 instance.name = "didactic"
 
-demandFiller_Dcpf(PATH_IN+"/"+PATH_INSTANCE+"/",instance.name+"/e",instance.name+"/f", instance.name+"/d",mult = mult, multi_f=multi_f, ratio_p=ratio_p, ratio_pc= ratio_pc)
+#demandFiller_Dcpf(PATH_IN+"/"+PATH_INSTANCE+"/",instance.name+"/e",instance.name+"/f", instance.name+"/d",mult = mult, multi_f=multi_f, ratio_p=ratio_p, ratio_pc= ratio_pc)
 #instance.load_data_prod(Prod,ratio)
-instance.data.load_Dd(instance.name,"d")
-
+#instance.data.load_Dd(instance.name,"d")
+instance.load_instance()
 
 #instance.data.print_d()
 #instance.data.save_d(instance.name,"bababa")
 # instance.load_instance()
 # print(check_before_resolve(instance))
-instance.load_instance()
+
 #instance.data.O = gen_O(instance.data.N)
 instance.save_instance()
 
