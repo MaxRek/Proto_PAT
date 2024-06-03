@@ -33,6 +33,7 @@ instance.name = "didactic"
 #demandFiller_Dcpf(PATH_IN+"/"+PATH_INSTANCE+"/",instance.name+"/e",instance.name+"/f", instance.name+"/d",mult = mult, multi_f=multi_f, ratio_p=ratio_p, ratio_pc= ratio_pc)
 #instance.load_data_prod(Prod,ratio)
 #instance.data.load_Dd(instance.name,"d")
+
 instance.load_instance()
 
 #instance.data.print_d()
@@ -41,5 +42,4 @@ instance.load_instance()
 # print(check_before_resolve(instance))
 
 #instance.data.O = gen_O(instance.data.N)
-instance.save_instance()
 

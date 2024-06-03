@@ -19,7 +19,7 @@ class Dec:
         #x_{i,j}^n
         self.xnc = []
         self.xnp = []
-        for i in range(len(n)):
+        for i in range(n):
             self.xnc.append(np.zeros((n+c,n+c),dtype=int).tolist())
             self.xnp.append(np.zeros((n+p+1,n+p+1),dtype=int).tolist())
 
@@ -43,8 +43,8 @@ class Dec:
 
         #l^n_{f,PT}
         self.LnfPT = []
-        for i in range(len(n)):
-            self.LnfPT.append(np.zeros((f,p+t)).tolist)()
+        for i in range(n):
+            self.LnfPT.append(np.zeros((f,p+t)).tolist())
 
     def load_dec(self, path:str, name:str):
         with(open(path+name+".json",'r')) as f:
@@ -71,10 +71,10 @@ class Dec:
         to_write["wt"] = self.wt
         to_write["wk"] = self.wk
         to_write["LnfPT"] = self.LnfPT
-
+        
         with(open(path+name+".json",'w')) as f:
             f.write(json.dumps(to_write,indent=4,sort_keys=True))
-
+            
     def print_x(self):
             print("Collecte")
             print(self.xnc)
