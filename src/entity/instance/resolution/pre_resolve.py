@@ -9,6 +9,7 @@ def reduction(inst:Instance):
     indexes_loc = [[],[]]
     sub_tsp = []
 
+
     #Récupération des clients ayant passé commande
     indexes_loc[0] = list(inst.data.d.keys())
 
@@ -31,6 +32,7 @@ def reduction(inst:Instance):
     # print(indexes_loc)
     # print(sub_tsp)
 
+
     #Adaptation de D pour ne récupérer que les clients des producteurs visités
     #D_{p,c}
     sub_D = np.zeros((len(indexes_loc[1]),len(indexes_loc[0])),dtype=int).tolist()
@@ -38,12 +40,23 @@ def reduction(inst:Instance):
         for j in range(len(indexes_loc[1])):#print(j)
             if(j in inst.data.d[i].keys()):
                 sub_D[j][i] = 1
-   
-    #print(sub_D)
+
+    #Modif de d pour refléter nouveau indices
+    new_d = {}
+    for i in inst.data.d.keys():
+        i_c = i + inst.data.N
+        new_d[i_c] = {}
+        for j in inst.data.d[i].keys():
+            j_c = inst.data.N+len(indexes_loc[0]) + indexes_loc[1].index(j)
+            new_d[i_c][j_c] = []
+            for k in inst.data.d[i][j]:
+                new_d[i_c][j_c].append(k)
+    
+    #print(new_d)
 
     #adaptation de c pour réduire la matrice de coût uniquement à ceux qui nous intéressent
     #c_{i,j} 
-    total = inst.data.N + len(indexes_loc[0]) + len(indexes_loc[1])+1
+
     #Rassemblement des indexes
     sum_ind = list(range(inst.data.N))
     for i in indexes_loc[0]:
@@ -51,24 +64,15 @@ def reduction(inst:Instance):
     for i in indexes_loc[1]:
         sum_ind.append(i+inst.data.N+inst.data.C)
     
-    #print("total = "+str(total)+ ", sum_ind = " +str(len(sum_ind)))
-
     sum_ind.append(inst.data.N+inst.data.C+inst.data.P)
-    #print(sum_ind)
 
-    # print(str(inst.data.N) + " "+ str(len(indexes_loc[0]))+ " "+ str(len(indexes_loc[1])) + " " + str(len(indexes_loc[0])+len(indexes_loc[1])+inst.data.N) + " " +str(len(sum_ind)))
+    #print(str(len(inst.data.c)) + " "+ str(len(inst.data.c[0])))
+    sub_c = sub_matrix(inst.data.c, sum_ind)
+    #print(str(len(sub_c)) + " "+ str(len(sub_c)))
+    
 
-    #print(inst.data.c[115])
-
-
-    # print(len(sum_ind))
-    # print(total)
-
-    # print(str(len(inst.data.c)) + " "+ str(len(inst.data.c[0])))
-    sub_c = sub_matrix(inst.data.c, sum_ind)[len(sum_ind)-1]
-
-    sdata = Sub_data(inst.data.N,inst.data.C,inst.data.P,inst.data.F,sub_tsp, inst.data.Q, inst.data.O, sub_D, inst.data.d, sub_c, indexes_loc, inst.data.df)
-    sdec = Dec(inst.data.C,inst.data.N,inst.data.P, 1, inst.data.F, inst.data.K)
+    sdata = Sub_data(inst.data.N,len(indexes_loc[0]),len(indexes_loc[1]),inst.data.F,sub_tsp, inst.data.Q, inst.data.O, sub_D, new_d, sub_c, indexes_loc, inst.data.df)
+    sdec = Dec(len(indexes_loc[0]),inst.data.N,len(indexes_loc[1]), 1, inst.data.F, inst.data.K)
 
     # for i in i.data.d.keys():
     #     if 

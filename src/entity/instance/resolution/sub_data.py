@@ -15,6 +15,7 @@ class Sub_data :
     O:list
     D:list
     d:dict
+    rev_d:dict
     c:list
     locations:list
 
@@ -22,8 +23,8 @@ class Sub_data :
     def __init__(self, n:int, C:int, p:int, f:int, tsp :list, Q:int, O:list ,D:list, d:dict, c:list, ind:list, df:Df) -> None:
         self.N = n
         self.C = C+self.N
-        self.p = p+self.C
-        self.T = 1+self.p
+        self.P = p+self.C
+        self.T = 1+self.P
 
         self.F = f
         self.TSp = tsp
@@ -48,5 +49,16 @@ class Sub_data :
         for i in range(df.T.shape[0]):
             self.locations.append((df.F.iloc[i]["x"],df.F.loc[i]["y"]))
 
-        print(len(self.locations))
+        self.rev_d = {}
+        for key in self.d.keys():
+            # print(int(key))
+            for key2 in self.d[key]:
+                #print(key2)
+                if key2 not in self.rev_d:
+                    self.rev_d[key2] = {}
+                if key not in self.rev_d[key2]:
+                    self.rev_d[key2][key] = []
+                for value in self.d[key][key2]:
+                    self.rev_d[key2][key].append(value)
+        #print(len(self.locations))
 
