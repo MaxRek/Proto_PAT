@@ -305,6 +305,9 @@ def demandFiller_Dcpf(path : str, file_e : str, file_p : str, file_d : str,mult:
         ratio_pc = np.ones(len(pos_SUB_DEMAND_key),dtype=int).tolist()
     #print(ind_f_p)
 
+    # print(values)
+    # print(demand["Legumes"])
+
     #Pour chaque etablissement
     for e in range(demand.shape[0]):
         temp_ratio_pc = np.zeros(len(pos_SUB_DEMAND_key),dtype=int).tolist()
@@ -332,6 +335,7 @@ def demandFiller_Dcpf(path : str, file_e : str, file_p : str, file_d : str,mult:
                         temp_ratio_pc[f] += 1
                         temp_f.append(f)
                         temp_d.append(demand.iloc[e][list(prod.keys())[f]]/ratio_pc[f])
+                        #print(temp_d)
                         #On vérifie si le prod ne produit pas d'autres filières, si oui on associe directement s'il ya une place à remplir
                         for j in range(len(ratio_pc)):
                             if j != f:
@@ -354,11 +358,11 @@ def demandFiller_Dcpf(path : str, file_e : str, file_p : str, file_d : str,mult:
                     # values = [data_e.loc[e]["Nom de la structure"],data_p.loc[temp_p[i]]["Nom"],list(prod.keys())[f],temp_f[i]]
 
                     # r = pd.DataFrame([values] ,columns = ["E","P","F","d"])
-
-                d = pd.concat([r_ind,d], ignore_index=True)
+                    d = pd.concat([d,r_ind], ignore_index=True)
+                
                 # d = pd.concat([r,d], ignore_index=True)
 
-    #print(d)
+    #print(d["d"].loc[d["F"] == 0])
 
     #print(demand.iloc[e])
     d.to_csv(path+file_d+".csv",sep=";")
@@ -396,5 +400,5 @@ def gen_O(N:int,prix_mc:float = COUT_METRE_CARRE,surface:int = NB_METRE_CARRE,ec
     for i in range(N):
         r[i] = round((surface * ((prix_mc*(1-ecart))+prix_mc*ecart*random.random()*2))*ratio)
 
-    print(r)
+    #print(r)
     return r

@@ -48,7 +48,6 @@ class Data:
         
     def save_data(self, path, name):
         writer = open(path+name+"/data.txt",'w')
-        print(self.D)
         writer.write("N:"+str(self.N)+"\n")
         writer.write("C:"+str(self.C)+"\n")
         writer.write("P:"+str(self.P)+"\n")
