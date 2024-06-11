@@ -13,7 +13,7 @@ from src.entity.aff import Aff
 from src.entity.instance.instance import Instance
 #from src.resolution.check import check_before_resolve
 
-truc = Aff([47.37412011769598, -2.234728966487376],10)
+truc = Aff()
 truc.df.load_csv(path=PATH_IN+"/"+PATH_INSTANCE+"/didactic/",e_name="e",f_name="f",n_name="n",t_name="t")
 # truc.add_point(truc.df)
 # truc.M.save("Map_PAT_t.ht#ml")

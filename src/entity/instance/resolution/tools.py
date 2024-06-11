@@ -1,4 +1,7 @@
 import numpy as np
+import random
+import bisect
+
 
 def sub_matrix(M : list, indexes : list):
     len_ind = len(indexes)
@@ -8,6 +11,9 @@ def sub_matrix(M : list, indexes : list):
             new_M[i][j] = M[indexes[i]][indexes[j]]
 
     return new_M
+
+def rand_ind_in_list(l:list):
+    return round(random.random()*(len(l)-1))
 
 #Suite de fonctions utilisés pour le calcul
 
@@ -46,6 +52,32 @@ def get_sum_qt_c_by_d(d:dict, c:int, f:int):
         for values in d[c][key]:
             sum[values[0]] += values[1]
     return sum
+
+#Récupère toutes les quantités demandés par une liste de client c_ml
+def get_sum_qt_c_l_by_d(d:dict, c_l:list, f:int):
+    Qts = np.zeros(len(c_l)).tolist()
+    for i in range(len(c_l)):
+        Qts[i] = sum(get_sum_qt_c_by_d(d,c_l[i],f)) 
+    return Qts
+
+#Calcul les quantités à récupérer chez les différents dépôts de produits propres 
+#(producteurs/transformateur) pour la liste de clients c_l
+#Indique aussi si il faut aller voir le transformateur
+# def calc_LnfPT_c(d:dict, c_l:list, C:int, pt:int,f:int):
+#     LnfPT = np.zeros((pt,f)).tolist()
+#     sum_fs = 0
+#     for c in c_l:
+#         for prod in d[c].keys():
+#             for value in d[c][prod]:
+#                 if value[0] == 0:
+#                     sum_fs += value[1]
+#                 else:
+#                     LnfPT[prod-C][value[0]] += value[1]
+#     t = 0
+#     if sum_fs > 0:
+#         LnfPT[-1][0] = sum_fs
+#         t = 1
+#     return (LnfPT, t)
 
 #Calcul les quantités à récupérer chez les différents dépôts de produits propres 
 #(producteurs/transformateur) pour la liste de clients c_l
@@ -96,7 +128,8 @@ def add_LnfPT(L1:list, L2:list):
         
     return l_r
 
-#Déterminer la quantité de produits propres à collecter sur un point de collecte
+#Déterminer la quantité de produits propres à collecter 
+#pour une plateforme aux points de collecte (retiens les sommets où récupérer)
 def cumul_qt_PT_by_LnfPT(LnfPT:list):
     qt_PT = np.zeros(len(LnfPT)).tolist()
     indexes_pt = []
@@ -120,15 +153,41 @@ def get_sum_qt_fs(rev_d:dict):
                     sum_fs += values[1]
     return sum_fs
 
+#Retourne les indices de producteurs et la quantité de produits sales associées à récupérer pour le transformateur
+def get_fs_prod_ind_qt(rev_d:dict):
+    indexes = []
+    qt = []
+    for prod in rev_d.keys():
+        sum_qt = 0
+        for cli in rev_d[prod].keys():
+            for values in rev_d[prod][cli]:
+                if values[0] == 0:
+                    sum_qt += values[1]
+        if sum_qt > 0:
+            indexes.append(prod)
+            qt.append(sum_qt)
+    return (indexes, qt)
+
+
 #Récupère les producteurs à visiter pour un client
 def get_p_c_by_d(d:dict, c:int):
     #print(list(d[c].keys()))
     for i in d[c].keys():
         for value in d[c][i]:
             if value[1] <= 0:
-                
                 print("Erreur : commande sans quantités, c = "+str(c)+", p = "+str(i)+"d[c][p] = "+str(value))
     return(list(d[c].keys()))
+
+#Récupère les producteurs à visiter pour une liste de client
+def get_p_cl_by_d(d:dict, cl:list):
+    p_l = []
+    for c in cl:
+        temp = get_p_c_by_d(d,c)
+        for p in temp:
+            if p not in p_l:
+                #bisect.insort(p_l, p)
+                p_l.append(p)
+    return p_l
 
 #Récupère les clients à visiter pour le producteur (debug)
 def get_c_p_by_rev_d(rev_d:dict, p:int):
@@ -137,3 +196,4 @@ def get_c_p_by_rev_d(rev_d:dict, p:int):
 #Recupère tous les clients affectés à une plateforme
 def get_wc_by_n(wc:list, n:int):
     return(list(i for i,j in enumerate(wc) if j == 1))
+

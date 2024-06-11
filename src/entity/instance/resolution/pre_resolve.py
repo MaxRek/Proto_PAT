@@ -1,6 +1,6 @@
 from ..instance import Instance
 from ..instance import Dec
-from .sub_data import Sub_data
+from .struct.sub_data import Sub_data
 from.tools import sub_matrix
 
 import numpy as np

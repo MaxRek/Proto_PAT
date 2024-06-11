@@ -1,5 +1,4 @@
-from ..instance import Instance
-from ...df import Df
+from ....df import Df
 
 import numpy as np
 
@@ -47,7 +46,7 @@ class Sub_data :
                 self.locations.append((df.F.iloc[i]["x"],df.F.loc[i]["y"]))
 
         for i in range(df.T.shape[0]):
-            self.locations.append((df.F.iloc[i]["x"],df.F.loc[i]["y"]))
+            self.locations.append((df.T.iloc[i]["x"],df.T.loc[i]["y"]))
 
         self.rev_d = {}
         for key in self.d.keys():
