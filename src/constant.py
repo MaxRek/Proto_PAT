@@ -1,6 +1,8 @@
 APIKEY_OPENROUTE = '5b3ce3597851110001cf62483df00dfb4ccb4e8c91dc5e03a8263482'
 PRIX_ESSENCE_100_KM = 7.5
 TARIF_HORAIRE_HT = 11.65
+ZOOM = 10
+LOC_BRIERE = [47.37412011769598, -2.234728966487376]
 
 #Path
 PATH_IN = "in"
@@ -52,7 +54,7 @@ SUB_DEMAND = {
 }
 COMMUNES = ["Assérac","Batz-sur-Mer","Besné","Camoël","Crossac","Donges","Drefféac","Férel","Guenrouët","Guérande","Herbignac","La Baule-Escoublac","La Chapelle-des-Marais","La Turballe","Le Croisic", "Le Pouliguen", "Mesquer", "Missillac","Montoir-de-Bretagne","Pénestin","Piriac-sur-Mer","Pontchâteau", "Pornichet" , "Prinquiau", "Saint-André-des-Eaux","Sainte-Anne-sur-Brivet","Saint-Gildas-des-Bois","Saint-Joachim","Saint-Lyphard","Saint-Malo-de-Guersac","Saint-Molf","Saint-Nazaire","Sainte-Reine-de-Bretagne","Sévérac","Trignac"]
 
-COUT_METRE_CARRE = 1000
+COUT_METRE_CARRE = 1000.0
 NB_METRE_CARRE = 200
 ECART_PRIX_PLAT = 0.3
 RATIO_AMORTISSEMENT = 1/365

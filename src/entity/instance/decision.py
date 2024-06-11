@@ -19,7 +19,7 @@ class Dec:
         #x_{i,j}^n
         self.xnc = []
         self.xnp = []
-        for i in range(len(n)):
+        for i in range(n):
             self.xnc.append(np.zeros((n+c,n+c),dtype=int).tolist())
             self.xnp.append(np.zeros((n+p+1,n+p+1),dtype=int).tolist())
 
@@ -30,21 +30,21 @@ class Dec:
         self.y = np.zeros(n).tolist()
 
         #wc_{c,n}
-        self.wc = np.zeros((c,n),dtype=int).tolist()
+        self.wc = np.zeros((n,c),dtype=int).tolist()
 
         #wp_{p,n}
-        self.wp = np.zeros((p,n),dtype=int).tolist()
+        self.wp = np.zeros((n,p),dtype=int).tolist()
             
         #wt_{t,n}
         self.wt = np.zeros(n,dtype=int).tolist()
 
         #wk_{k,n}
-        self.wk = np.zeros((k,n),dtype=int).tolist()
+        self.wk = np.zeros((n,k),dtype=int).tolist()
 
         #l^n_{f,PT}
         self.LnfPT = []
-        for i in range(len(n)):
-            self.LnfPT.append(np.zeros((f,p+t)).tolist)()
+        for i in range(n):
+            self.LnfPT.append(np.zeros((p+1,f)).tolist())
 
     def load_dec(self, path:str, name:str):
         with(open(path+name+".json",'r')) as f:
@@ -71,10 +71,10 @@ class Dec:
         to_write["wt"] = self.wt
         to_write["wk"] = self.wk
         to_write["LnfPT"] = self.LnfPT
-
+        
         with(open(path+name+".json",'w')) as f:
             f.write(json.dumps(to_write,indent=4,sort_keys=True))
-
+            
     def print_x(self):
             print("Collecte")
             print(self.xnc)
@@ -99,7 +99,13 @@ class Dec:
         print("°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°")
         self.print_x()
 
-
+    def visite_plat_prod(self):
+        indexes_n = [i for i, j in enumerate(self.y) if j == 1]
+        for n in indexes_n:
+            indexes_p = [i for i, j in enumerate(self.wp[n]) if j == 1]
+            indexes_c = [i for i, j in enumerate(self.wc[n]) if j == 1]
+            print("Plateforme n"+str(n)+"\n Affecté aux clients "+str(indexes_c)+"\n Affecté aux producteurs "+str(indexes_p))
+        
         
 
 
