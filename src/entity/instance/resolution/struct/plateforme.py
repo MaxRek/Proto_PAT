@@ -84,18 +84,12 @@ class Plateforme:
                 self.pt_affect.append(T-1)
             self.Lfptn[-1][0] = sum_fs
 
-    
-
-    #Reduire LnfPT selon les producteurs à visiter, et les quantités propres associées
-    def reduct_LnfPT(self, C:int):
-        indexes = []
-        qts = []
-        for i in range(len(self.Lfptn)):
-            sum_prod = sum(self.Lfptn[i])
-            if sum_prod > 0:
-                indexes.append(i+C)
-                qts.append(sum_prod)
-        return(indexes, qts)
+    def tournee_post_del_point(self,t_type:int, i:int):
+        r = False
+        if self.tournees[t_type][i].size == 0:
+            self.tournees[t_type].pop(i)
+            r = True
+        return r
 
     #but de vérification, retourne tous les producteurs visités lors des tournées et les quantités des tournées
     def verif_all_pt_visited(self):
@@ -130,7 +124,7 @@ class Plateforme:
     def calc_obj_plat_tournee(self,O:list, c:list):
         obj = 0
         obj += O[self.numero]
-        print(O[self.numero])
+        #print(O[self.numero])
         for t in self.tournees[0]:
             obj += t.calc_obj_tournee(c)
         for t in self.tournees[1]:

@@ -1,7 +1,7 @@
 from .plateforme import Plateforme
 from .tournee import Tournee
 from ..algorithm.CAW import CAW_F
-from ..tools import get_sum_qt_c_l_by_d
+from ..tools import get_sum_qt_c_l_by_d,reduct_LnfPT
 import bisect
 
 class Solution:
@@ -35,7 +35,7 @@ class Solution:
 
         #Pour chaque plateforme, vérification que les producteurs soient bien affectés + tournée de collecte propres
         for p in self.plat:
-            temp_LnfPT = p.reduct_LnfPT(C)
+            temp_LnfPT = reduct_LnfPT(p.Lfptn,C)
             temp_pt = p.verif_all_pt_visited()
             if temp_pt[0]: 
                 if sorted(p.pt_affect) == sorted(temp_LnfPT[0]) and sorted(temp_LnfPT[0]) == sorted(temp_pt[1]):
@@ -92,7 +92,7 @@ class Solution:
 
     def init_CAW_cp(self, c:list, Q:float, C:int):
         for i in self.plat:
-            temp = i.reduct_LnfPT(C)
+            temp = reduct_LnfPT(i.Lfptn,C)
             i.tournees[0] = CAW_F(c, Q, i.numero, temp[0], temp[1])
 
     def init_CAW_lp(self, c:list, Q:float, d:dict, f:int):
