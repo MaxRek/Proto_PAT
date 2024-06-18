@@ -85,7 +85,6 @@ def N1_intra_rand(x:Solution, entry:list):
 def N1_inter_rand(x:Solution, entry:list):
     e = [-1,-1,[-1,-1],[-1,-1]]
     if entry[0] == -1:
-        print("Gen")
         i = rd.randint(0,len(x.plat))
         if i == 0:
             e[0] = -2
@@ -518,7 +517,6 @@ def N3_inter_rand(x:Solution, entry:list = [-1,-1,[-1,-1],[[-1,-1],-1]]):
         e[3][0] = entry[3][0]
     
     if entry[3][1] == -1 :
-
         if e[0] == -2:
             # x.sales[e[2][0]].print_tournee()
             # x.sales[e[2][1]].print_tournee()
@@ -527,10 +525,33 @@ def N3_inter_rand(x:Solution, entry:list = [-1,-1,[-1,-1],[[-1,-1],-1]]):
             # x.plat[e[0]].tournees[e[1]][e[2][0]].print_tournee()
             # x.plat[e[0]].tournees[e[1]][e[2][1]].print_tournee()
             e[3][1] = rd.choice(list(range(x.plat[e[0]].tournees[e[1]][e[2][1]].size)))
-        
     return e
 
-def N5_rand(x:Solution, N:int, entry = [-1,-1]):
+
+def N5_add_rand(x:Solution, N:int, entry = [-1]):
+    e = [-1]
+
+    if entry[0] == -1:
+        numero_plat_ouvertes = []
+        for i in range(len(x.plat)):
+            numero_plat_ouvertes.append(x.plat[i].numero)
+        
+        e[0] = rd.choice([i for i, j in enumerate(list(range(N))) if j not in numero_plat_ouvertes])
+    else:
+        e[0] = entry[0]
+    
+    return e
+
+def N5_del_rand(x:Solution, N:int, entry = [-1]):
+    e = [-1]
+    if entry[0] == -1:
+        e[0] = rd.choice(list(range(len(x.plat))))
+    else:
+        e[0] = entry[0]
+    
+    return e
+
+def N5_swap_rand(x:Solution, N:int, entry = [-1,-1]):
     e = [-1,-1]
     if entry[0] == -1:
         e[0] = rd.choice(list(range(len(x.plat))))
@@ -545,4 +566,34 @@ def N5_rand(x:Solution, N:int, entry = [-1,-1]):
     else:
         e[1] = entry[1]
     
+    return e
+
+def N6_one_rand(x:Solution, C:int, N:int, entry = [-1,-1]):
+    e = [-1,-1]
+    if entry[0] == -1:
+        print(list(range(N,C)))
+        e[0] = rd.choice(list(range(N,C)))
+    else:
+        e[0] = entry[0]
+
+    return e
+
+def N6_some_rand(x:Solution, C:int, N:int, entry = [[-1],[-1]]):
+    e = [[],[]]
+    
+    nb = rd.choice(range(C-N))
+    while(len(e[0]) < nb):
+        print(e[0])
+        c = rd.choice(range(C-N))
+        if c not in e[0]:
+            e[0].append(c+N)
+            e[1].append(rd.choice(range(len(x.plat))))
+    
+    return e
+
+def N6_all_rand(x:Solution, len:int):
+    e = []
+    for i in range(len):
+        e.append(rd.choice(list(range(0,len(x.plat)))))
+
     return e

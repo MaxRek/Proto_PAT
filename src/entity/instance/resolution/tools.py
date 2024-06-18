@@ -110,7 +110,6 @@ def reduct_LnfPT(Lfptn:list, C:int):
             indexes.append(i+C)
             qts.append(sum_prod)
     return(indexes, qts)
-
             
 #Verifie qu'un point de récolte ne dépasse pas la capacité Q des véhicules
 def verif_LnfPT(LnfPT:list, Q:int):

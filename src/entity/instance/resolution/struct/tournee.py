@@ -14,13 +14,13 @@ class Tournee:
         s = len(points)
         # Modification de l'ordre
         if ind == -1:
-            for point in range(s):
-                self.order.insert(self.size,points[point])
+            for i in range(s):
+                self.order.insert(self.size,points[i])
                 self.size += 1
-                self.load += QT_recup[point]
+                self.load += QT_recup[i]
         elif ind >= 0 and ind < len(self.order):
             self.order.insert(ind,points)
-            self.size += s
+            self.size += 1
         else:
             print("Erreur : ind n'est pas une valeur correcte : "+str(ind))
 
@@ -32,9 +32,9 @@ class Tournee:
 
     def calc_load(self, reduce_LfnPT:tuple):
         self.load = 0
-        for i in range(len(reduce_LfnPT[0])):
-            if reduce_LfnPT[0][i] in self.order:
-                self.load += reduce_LfnPT[1][i]
+        for i in self.order:
+            if i in reduce_LfnPT[0]:
+                self.load += reduce_LfnPT[1][reduce_LfnPT[0].index(i)]
 
     def insert_sommet(self, s:int, i:int):
         self.size += 1
@@ -52,6 +52,7 @@ class Tournee:
     #pop un sommet dans l'ordre
     def pop(self, i:int):
         self.size -= 1
+        print(i)
         s = self.order.pop(i)
         return s 
     
@@ -62,8 +63,8 @@ class Tournee:
         #Entre point d'origine et premier sommet visités :
         for i in range(len(order)-1):
             costs.append(c[order[i]][s] + c[s][order[i+1]])
-        print(costs)
-        print(sorted(range(len(costs)), key=lambda k: costs[k], reverse=True))
+        #print(costs)
+        #print(sorted(range(len(costs)), key=lambda k: costs[k], reverse=True))
         return self.insert_sommet(s,sorted(range(len(costs)), key=lambda k: costs[k], reverse=True)[0])
 
     #Mouvement de swap N2_intra
