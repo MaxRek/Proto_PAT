@@ -89,6 +89,9 @@ class Plateforme:
             # for i in self.tournees[1]:
             #     i.print_tournee()
             #Mise à jour des quantités dans les tournées
+            self.print_plateforme()
+            print(unwanted_c_l)
+            print(t_modif)
             for i in t_modif:
                 t = self.tournees[1][i]
                 t.calc_load((t.order,get_sum_qt_c_l_by_d(data.d, t.order, data.F)))
