@@ -73,16 +73,13 @@ def N1_inter(x:Solution, data:Sub_data, entry = [-1,-1,[-1,-1],[-1,-1]]):
             xp.sales.pop(e[2][0])
         # print("La tournée a été supprimée : "+str(deleted))
         
+        fs= get_fs_prod_ind_qt(data.rev_d)
+        
+        t1.calc_load(fs)
         if not deleted:
-            if e[1] == 0: #Tournée de collecte
-                t0.calc_load(reduct_LnfPT(xp.plat[e[0]].Lfptn,data.C))
-            else: #Tournée de livraison
-                t0.load = sum(get_sum_qt_c_l_by_d(data.d, t0.order,data.F))
-            t0.print_tournee()
-        if e[1] == 0: #Tournée de collecte
-            t1.calc_load(reduct_LnfPT(xp.plat[e[0]].Lfptn,data.C))
-        else: #Tournée de livraison
-            t1.load = sum(get_sum_qt_c_l_by_d(data.d, t1.order,data.F))
+            t0.calc_load(fs)
+        t1.calc_load(fs)
+
         # t1.print_tournee()
         if(t0.load > data.Q or t1.load > data.Q):
             print("Insertion impossible pour points "+str(e[3])+" de tournée "+str(e[2][0])+" à "+str(e[2][1]))
