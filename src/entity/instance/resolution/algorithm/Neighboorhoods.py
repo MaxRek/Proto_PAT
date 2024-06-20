@@ -538,7 +538,8 @@ def N6_one(x:Solution, data:Sub_data, entry = [-1,-1]):
 def N6_some(x:Solution, data:Sub_data, entry = [[-1],[-1]]):
     if entry[0] == [-1] or entry[1] == [-1]:
         e = N6_some_rand(x,data.C,data.N,entry)
-    else:
+        print("gen")
+    elif len(entry[0][0]) == len(entry[0][1]) :
         e = copy.deepcopy(entry)
     # print(entry)
     # print(e)
@@ -548,8 +549,13 @@ def N6_some(x:Solution, data:Sub_data, entry = [[-1],[-1]]):
     for s in range(len(entry[0])):
         found = False
         i = 0
-        
+        print(entry)
+        print('----------')
+        print(e)
+        print(s)
+        print(len(x.plat))
         while not found and i < len(x.plat):
+            print(i)
             if e[0][s] in xp.plat[i].cli_affect:
                 found = True
             else:

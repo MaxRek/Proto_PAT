@@ -3,8 +3,10 @@ from..struct.sub_data import Sub_data
 from....aff import Aff
 from..algorithm.Neighboorhoods import *
 from..algorithm.Neighboorhoods_next import *
+import datetime
 
-def GVNS(path:str, data:Sub_data, x : Solution, lim_calc:int, lim_perturb:int):
+
+def GVNS(path:str, data:Sub_data, x : Solution, lim_calc:int, lim_perturb:int,benchmark:dict):
     if x.verif_solution(data.C,data.N,data.Q):
         aff = Aff()
 
@@ -57,19 +59,27 @@ def GVNS(path:str, data:Sub_data, x : Solution, lim_calc:int, lim_perturb:int):
                     fonctions = [N6_one,N6_some,N6_all]
                     prob = [1/5,3/5,1/5]
                     rand = rd.random()
-                    i = 0
-                    sum_prob = prob[i]
+                    j = 0
+                    sum_prob = prob[j]
                     stop = False
-                    while not stop and i+1 < len(prob):
-                        sum_prob += prob[i+1]
+                    while not stop and j+1 < len(prob):
+                        sum_prob += prob[j+1]
                         if sum_prob > rand:
                             stop = True
                         else:
-                            i+= 1
-                    xpp = fonctions[i](xp,data)
+                            j+= 1
+                    xpp = fonctions[j](xp,data)
+                    benchmark["nb_plat"].append(len(xpp.plat))
+                    if k == 0:
+                        benchmark["k_VNS"].append((i,j))
+                    else:
+                        benchmark["k_VNS"].append((-1,j))
 
-                    #Sauvegarde post VND
-                    name = "VNS_"+str(nb_perturbations)+"_pre_loc_z"+str(xpp.calc_func_obj(data.O,data.c))
+                    #Sauvegarde pré VND
+                    obj_pre = xpp.calc_func_obj(data.O,data.c)
+                    benchmark["pre_z"].append(obj_pre)
+
+                    name = "VNS_"+str(nb_perturbations)+"_pre_loc_z"+str(sum(obj_pre))
                     temp = xpp.soluce_propre_to_map(data.locations, data.T-1)
                     aff.save_soluce(path+"/"+name+"_p",temp[0],roads = temp[1])
                     aff.clean_M()
@@ -77,9 +87,17 @@ def GVNS(path:str, data:Sub_data, x : Solution, lim_calc:int, lim_perturb:int):
                     aff.save_soluce(path+"/"+name+"_s",temp[0],roads = temp[1])
                     aff.clean_M()
 
-                    xppp = VND(path, data, xpp, lim_calc, nb_perturbations)
+                    time_start = datetime.datetime.now()
+                    xppp = VND(path, data, xpp, lim_calc, nb_perturbations, benchmark)
+                    time_stop = datetime.datetime.now()-time_start
+                    print(time_stop)
+                    benchmark["time"].append(time_stop.seconds)
                     # xppp.print_all_plateformes()
-                    if x.calc_func_obj(data.O,data.c) > xppp.calc_func_obj(data.O,data.c):
+                    obj1 = x.calc_func_obj(data.O,data.c)
+                    obj2 = xppp.calc_func_obj(data.O,data.c)
+                    benchmark["z"].append(obj2)
+
+                    if sum(obj1) > sum(obj2):
                         print("xpp meilleur Solution dans voisinage de x")
                         x = xpp
                         k = 0
@@ -96,14 +114,15 @@ def GVNS(path:str, data:Sub_data, x : Solution, lim_calc:int, lim_perturb:int):
             
     return x
 
-def VND(path, data:Sub_data, x : Solution, lim_calc:int, nb_perturb:int):
+def VND(path, data:Sub_data, x : Solution, lim_calc:int, nb_perturb:int, benchmark:list):
     k_max = 4
     fonctions = [[N1_intra,N1_inter],[N2_intra,N2_inter],[N3_intra,N3_inter],[N4_intra,N4_inter]]
     print("___________________________________")
     print("Début algo VND")
     count_calc = 0
     aff = Aff()
-    
+    nb_modif = 0
+    benchmark["modif_k"].append([])
     while count_calc < lim_calc:
         k = 0
         entry = [-1]
@@ -138,7 +157,8 @@ def VND(path, data:Sub_data, x : Solution, lim_calc:int, nb_perturb:int):
                         print(str(x.calc_func_obj(data.O,data.c)) + " > " +str(obj_1))
                         if x.calc_func_obj(data.O,data.c) > obj_1:
                             print("xp meilleur Solution dans voisinage de x")
-
+                            nb_modif += 1
+                            benchmark["modif_k"][-1].append([entry[0],entry[1], k])
                             #Enregistrement solution
                             name = "VNS_"+str(nb_perturb)+"_VND_"+str(count_calc)+"_z"+str(obj_1)
                             temp = x.soluce_propre_to_map(data.locations, data.T-1)
@@ -170,4 +190,10 @@ def VND(path, data:Sub_data, x : Solution, lim_calc:int, nb_perturb:int):
             else:
                 k = k_max
             count_calc += 1
+
+    if count_calc == lim_calc:
+        benchmark["non_fini"].append(False)
+    else:
+        benchmark["non_fini"].append(True)
+    benchmark["nb_modifs"].append(nb_modif)
     return x
