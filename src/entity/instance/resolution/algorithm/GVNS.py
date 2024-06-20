@@ -4,7 +4,7 @@ from....aff import Aff
 from..algorithm.Neighboorhoods import *
 from..algorithm.Neighboorhoods_next import *
 
-def GVNS(path:str, data:Sub_data, x : Solution, lim_calc:int, lim_perturb:int):
+def GVNS(path:str, data:Sub_data, x : Solution, lim_calc:int, lim_perturb:int,benchmark:dict):
     if x.verif_solution(data.C,data.N,data.Q):
         aff = Aff()
 
@@ -68,8 +68,11 @@ def GVNS(path:str, data:Sub_data, x : Solution, lim_calc:int, lim_perturb:int):
                             i+= 1
                     xpp = fonctions[i](xp,data)
 
-                    #Sauvegarde post VND
-                    name = "VNS_"+str(nb_perturbations)+"_pre_loc_z"+str(xpp.calc_func_obj(data.O,data.c))
+                    #Sauvegarde pré VND
+                    obj_pre = xpp.calc_func_obj(data.O,data.c)
+                    benchmark["pre_z"].append(obj_pre)
+
+                    name = "VNS_"+str(nb_perturbations)+"_pre_loc_z"+str(sum(obj_pre))
                     temp = xpp.soluce_propre_to_map(data.locations, data.T-1)
                     aff.save_soluce(path+"/"+name+"_p",temp[0],roads = temp[1])
                     aff.clean_M()
@@ -77,15 +80,22 @@ def GVNS(path:str, data:Sub_data, x : Solution, lim_calc:int, lim_perturb:int):
                     aff.save_soluce(path+"/"+name+"_s",temp[0],roads = temp[1])
                     aff.clean_M()
 
-                    xppp = VND(path, data, xpp, lim_calc, nb_perturbations)
+                    time_start = time.time.now()
+                    xppp = VND(path, data, xpp, lim_calc, nb_perturbations, benchmark)
+                    benchmark["time"].append(time.time.now()-time_start)
                     # xppp.print_all_plateformes()
-                    if x.calc_func_obj(data.O,data.c) > xppp.calc_func_obj(data.O,data.c):
+                    obj1 = x.calc_func_obj(data.O,data.c)
+                    obj2 = xppp.calc_func_obj(data.O,data.c)
+                    benchmark["z"].append(obj2)
+
+                    if sum(obj1) > sum(obj2):
                         print("xpp meilleur Solution dans voisinage de x")
                         x = xpp
                         k = 0
                     else:
                         xp = x
                         k += 1
+                    benchmark[""]
                     nb_perturbations += 1
                 else:
                     k = k_max    
