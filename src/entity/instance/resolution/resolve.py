@@ -7,7 +7,7 @@ import datetime
 
 import numpy as np
 
-def control(path:str,data: Sub_data, nb_calc : int = 20000, nb_perturb:int = 100):
+def control(path:str,data: Sub_data, nb_calc : int = 10, nb_perturb:int = 100):
     s = init_solution(data)
 
     if "benchmark" not in os.listdir(path):
@@ -20,8 +20,11 @@ def control(path:str,data: Sub_data, nb_calc : int = 20000, nb_perturb:int = 100
         "pre_z":[],
         "z" :[],
         "time": [],
+        "nb_plat" : [],
+        "k_VNS": [],
         "nb_modifs": [],
-        "fini": []
+        "modif_k": [],
+        "non_fini": []
     }
     os.mkdir(path_bench)
     
@@ -29,3 +32,5 @@ def control(path:str,data: Sub_data, nb_calc : int = 20000, nb_perturb:int = 100
 
     # aff = Aff()
     GVNS(path_bench,data, s, nb_calc, nb_perturb,benchmark)
+
+    print(benchmark)

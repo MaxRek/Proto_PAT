@@ -100,10 +100,14 @@ class Solution:
             p.repair(data)
     
     def calc_func_obj(self,O:list, c:list):
+        xs = 0
+        costs = [0,0]
         for t in self.sales:
-            xs = t.calc_obj_tournee(c)
+            xs += t.calc_obj_tournee(c)
         for p in self.plat:
-            costs = p.calc_obj_plat_tournee(O, c)   
+            temp = p.calc_obj_plat_tournee(O, c)
+            costs[0] += temp[0]
+            costs[1] += temp[1]    
         return [costs[0],costs[1],xs]
 
     def init_CAW_sales(self, c:list, Q:float, T_ind:int, indexes:list, Q_ind:list):
