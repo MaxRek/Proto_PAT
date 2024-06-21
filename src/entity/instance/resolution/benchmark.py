@@ -84,7 +84,7 @@ def plot_obj(obj:list,pre_obj:list, calc_bool:list, name:str):
             i_best_obj.append(i)
 
         ax.plot([i,i],[pre_obj[i],obj[i]], color ="green")
-        if calc_bool[i]:
+        if not calc_bool[i]:
             finished[0].append(obj[i])
             finished[1].append(i)
         else:
@@ -125,7 +125,7 @@ def plot_time(time:list,calc_bool:list,name:str):
             best_time.append(time[i])
         else:
             best_time.append(best_time[i-1])
-        if calc_bool[i]:
+        if not calc_bool[i]:
             ax.plot(i,time[i], marker = 'o', color = "red")
         else:
             ax.plot(i,time[i], marker = 'x', color = "black")
