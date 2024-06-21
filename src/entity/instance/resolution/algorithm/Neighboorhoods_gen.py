@@ -580,7 +580,7 @@ def N6_one_rand(x:Solution, C:int, N:int, entry = [-1,-1]):
 def N6_some_rand(x:Solution, C:int, N:int, entry = [[-1],[-1]]):
     e = [[],[]]
     
-    nb = rd.choice(range(C-N))
+    nb = rd.choice(range(2,C-N))
     while(len(e[0]) < nb):
         c = rd.choice(range(C-N))
         if c not in e[0]:

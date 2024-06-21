@@ -7,6 +7,8 @@ import copy
 import time
 from ..tools import rand_ind_in_list, reduct_LnfPT, calc_LnfPT_c, get_fs_prod_ind_qt, get_sum_qt_c_l_by_d
 from .Neighboorhoods_gen import *
+from .CAW import CAW_F
+
 
 
 #INSERTION intra_tournee
@@ -537,18 +539,20 @@ def N6_one(x:Solution, data:Sub_data, entry = [-2,-2]):
 def N6_some(x:Solution, data:Sub_data, entry = [[-2],[-2]]):
     if entry[0] == [-2] or entry[1] == [-2]:
         e = N6_some_rand(x,data.C,data.N,entry)
-    else:
+        print("gen")
+    elif len(entry[0][0]) == len(entry[0][1]) :
         e = copy.deepcopy(entry)
     # print(entry)
     # print(e)
     
     xp = copy.deepcopy(x)
 
-    for s in range(len(entry[0])):
+    for s in range(2,len(entry[0])):
         found = False
         i = 0
-        
+
         while not found and i < len(x.plat):
+            print(i)
             if e[0][s] in xp.plat[i].cli_affect:
                 found = True
             else:
@@ -574,8 +578,26 @@ def N6_all(x:Solution, data:Sub_data):
         p.pt_affect.clear()
         p.tournees[0].clear()
         p.tournees[1].clear()
+        
+    
+    return xp
 
+def N6_reaffect(x:Solution, data:Sub_data):
+    xp = copy.deepcopy(x)
+    for p in xp.plat:
+        p.cli_affect.clear()
+        p.pt_affect.clear()
+        p.tournees[0].clear()
+        p.tournees[1].clear()
+
+    for c in range(data.N,data.C):
+        min_c = []
+        for p in xp.plat:
+            min_c.append(data.c[p.numero][c])
+        xp.plat[min_c.index(min(min_c))].add_client(data.d,c)
+
+    # xp.init_CAW_cp(data.C, data.Q, data.C)
+    # xp.init_CAW_lp(data.c, data.Q, data.d, data.F)
     xp.repair_solution_post_N6(data)
-
 
     return xp

@@ -75,25 +75,29 @@ class Plateforme:
         for c in range(len(temp_c_l_p[1])):
             if temp_c_l_p[1][c] not in self.cli_affect:
                 unwanted_c_l.append((temp_c_l_p[1][c],temp_c_l_p[3][c]))
-        
+
         #Si des clients en trop sont dans des tournées, on les enlève.
         if unwanted_c_l != []:
-            t_modif = []
-            # for i in self.tournees[0]:
-            #     i.print_tournee()
-            #Suppression des sommets, 
             for c in unwanted_c_l:
-                self.tournee_del_point(1,c[1],c[0])
-                if c[1] not in t_modif:
-                    t_modif.append(c[1])
+                i = 0
+                founded = False
+
+                while not founded and i <len(self.tournees[1]):
+                #Suppression des sommets, 
+                    if c in self.tournees[1][i].order:
+                        founded = True
+                    else:
+                        i+=1
+
+                if founded:         
+                    b = self.tournee_del_point(1,i,c)
+                    if b:
+                        self.tournees[1][i].calc_load(temp_reduce)
             # for i in self.tournees[1]:
             #     i.print_tournee()
             #Mise à jour des quantités dans les tournées
-            self.print_plateforme()
-            print(unwanted_c_l)
-            print(t_modif)
-            for i in t_modif:
-                t = self.tournees[1][i]
+
+            for t in self.tournees[1]:
                 t.calc_load((t.order,get_sum_qt_c_l_by_d(data.d, t.order, data.F)))
         
         #Si des clients manquent dans les tournées, on les ajoute à la fin d'une tournée pouvant l'accueillir, sinon on crée une tournée spécifiquement pour lui
@@ -132,18 +136,21 @@ class Plateforme:
         
         #Si des producteurs en trop sont dans des tournées, on les enlève.
         if unwanted_pt_l != []:
-            t_modif = []
+            for pt in unwanted_pt_l:
+                i = 0
+                founded = False
 
-            #Suppression des sommets, 
-            for p in unwanted_pt_l:
-                self.tournee_del_point(1,p[1],p[0])
-                if p[1] not in t_modif:
-                    t_modif.append(p[1])
+                while not founded and i <len(self.tournees[0]):
+                #Suppression des sommets, 
+                    if pt in self.tournees[0][i].order:
+                        founded = True
+                    else:
+                        i+=1
 
-            #Mise à jour des quantités dans les tournées
-            for i in t_modif:
-                t = self.tournees[0][i]
-                t.calc_load(temp_reduce)
+                if founded:         
+                    b = self.tournee_del_point(0,i,pt)  
+                    if b:
+                        self.tournees[0][i].calc_load(temp_reduce)
             
         #Si des producteurs manquent dans les tournées, on les ajoute à la fin d'une tournée pouvant l'accueillir, sinon on crée une tournée spécifiquement pour lui
         
@@ -233,14 +240,14 @@ class Plateforme:
         return (b, ind_c, qt_c, ind_c_t)
     
     def calc_obj_plat_tournee(self,O:list, c:list):
-        obj = 0
-        obj += O[self.numero]
+        O = O[self.numero]
         #print(O[self.numero])
+        xp = 0
         for t in self.tournees[0]:
-            obj += t.calc_obj_tournee(c)
+            xp += t.calc_obj_tournee(c)
         for t in self.tournees[1]:
-            obj += t.calc_obj_tournee(c)
-        return obj
+            xp += t.calc_obj_tournee(c)
+        return [O,xp]
 
     def get_cli(self):
         return self.cli_affect
