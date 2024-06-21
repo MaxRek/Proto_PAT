@@ -9,7 +9,7 @@ from.benchmark import *
 
 import numpy as np
 
-def control(path:str,data: Sub_data, nb_calc : int = 20000, nb_perturb:int = 30):
+def control(path:str,data: Sub_data, nb_calc : int = 40000, nb_perturb:int = 30):
     s = init_solution(data)
 
     if "benchmark" not in os.listdir(path):
