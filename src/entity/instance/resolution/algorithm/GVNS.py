@@ -189,11 +189,15 @@ def VND(path, data:Sub_data, x : Solution, lim_calc:int, nb_perturb:int, benchma
                 k += 1                      
             else:
                 k = k_max
+                
             count_calc += 1
 
-    if count_calc == lim_calc:
-        benchmark["non_fini"].append(False)
-    else:
-        benchmark["non_fini"].append(True)
-    benchmark["nb_modifs"].append(nb_modif)
+        
+
+        if count_calc < lim_calc:
+            benchmark["non_fini"].append(False)
+        else:
+            benchmark["non_fini"].append(True)
+        benchmark["nb_modifs"].append(nb_modif)
+        count_calc = lim_calc
     return x
