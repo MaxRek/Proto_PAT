@@ -30,14 +30,16 @@ def control(path:str,data: Sub_data, nb_calc : int = 20000, nb_perturb:int = 50)
     }
     os.mkdir(path_bench)
     
-    path_stat = path_bench+"/stats"
-    os.mkdir(path_stat)
-
-    names = [path_stat+"/mixte", path_stat+"/pre", path_stat+"/post", path_stat+"/graph"]
-    
     # aff = Aff()
     GVNS(path_bench,data, s, nb_calc, nb_perturb,benchmark)
-    print(benchmark["pre_z"])
-    print(benchmark["z"])
-    plot_time(benchmark["time"], benchmark["non_fini"], path_stat+"/time")
+    print(benchmark)
+    path_stats = path_bench+"/stats"
+    names = [path_stats+"/pre_post",path_stats+"/pre",path_stats+"/post", path_stats+"/graph"]
+
+    os.mkdir(path_stats)
+    with open(path_stats+"/benchmark.txt",'w') as f:
+        f.write(str(benchmark))
+
+    plot_time(benchmark["time"],benchmark["non_fini"], path_stats+"/time")
     all_bar_obj(benchmark["z"],benchmark["pre_z"],benchmark["non_fini"],names)
+    print(benchmark)
