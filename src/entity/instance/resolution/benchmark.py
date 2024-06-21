@@ -26,19 +26,19 @@ def all_bar_obj(obj:list,pre_obj:list, calc_bool:list, names:list):
     sum_obj = []
     sum_pre_obj = []
     for i in range(len(obj)):
-        xs[0].append(pre_obj[i][0])
+        xs[0].append(pre_obj[i][2])
         xn[0].append(pre_obj[i][1])
-        On[0].append(pre_obj[i][2])
-        xs[0].append(obj[i][0])
+        On[0].append(pre_obj[i][0])
+        xs[0].append(obj[i][2])
         xn[0].append(obj[i][1])
-        On[0].append(obj[i][2])
+        On[0].append(obj[i][0])
         
-        xs[1].append(pre_obj[i][0])
+        xs[1].append(pre_obj[i][2])
         xn[1].append(pre_obj[i][1])
-        On[1].append(pre_obj[i][2])
-        xs[2].append(obj[i][0])
+        On[1].append(pre_obj[i][0])
+        xs[2].append(obj[i][2])
         xn[2].append(obj[i][1])
-        On[2].append(obj[i][2])
+        On[2].append(obj[i][0])
         sum_obj.append(obj[i][0]+obj[i][1]+obj[i][2])
         sum_pre_obj.append(pre_obj[i][0]+pre_obj[i][1]+pre_obj[i][2])
 
@@ -63,7 +63,7 @@ def bar_obj(costs:list, labels:list, title:str,name:str):
     for i in range(3):
         p = ax.bar(labels,costs[i], width, bottom = bottom, edgecolor = "black",color = colors[i])
         bottom += costs[i]
-        ax.bar_label(p, label_type = 'center')
+        #ax.bar_label(p, label_type = 'center')
     
     ax.set_title(title)
     ax.tick_params(axis='x', labelrotation=90)
@@ -91,7 +91,7 @@ def plot_obj(obj:list,pre_obj:list, calc_bool:list, name:str):
             i_best_obj.append(i)
 
         ax.plot([i,i],[pre_obj[i],obj[i]], color ="green")
-        if calc_bool[i]:
+        if not calc_bool[i]:
             finished[0].append(obj[i])
             finished[1].append(i)
         else:
@@ -133,7 +133,7 @@ def plot_time(time:list,calc_bool:list,name:str):
             best_time.append(time[i])
         else:
             best_time.append(best_time[i-1])
-        if calc_bool[i]:
+        if not calc_bool[i]:
             ax.plot(i,time[i], marker = 'o', color = "red")
         else:
             ax.plot(i,time[i], marker = 'x', color = "black")
