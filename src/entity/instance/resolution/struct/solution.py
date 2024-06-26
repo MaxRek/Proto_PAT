@@ -51,7 +51,7 @@ class Solution:
                                     print(temp_pt[2])
                                     print(sum(temp_c[2]))
                                     print(sum(temp_pt[2]))
-                                    meb = False
+                                    b = False
                             else:
                                 print("Erreur : Tous les clients visités dans les tournées != Clients affectés à la plateforme")
                                 print(sorted(p.cli_affect))
@@ -100,15 +100,12 @@ class Solution:
             p.repair(data)
     
     def calc_func_obj(self,O:list, c:list):
-        xs = 0
-        costs = [0,0]
+        obj = 0
         for t in self.sales:
-            xs += t.calc_obj_tournee(c)
+            obj += t.calc_obj_tournee(c)
         for p in self.plat:
-            temp = p.calc_obj_plat_tournee(O, c)
-            costs[0] += temp[0]
-            costs[1] += temp[1]    
-        return [costs[0],costs[1],xs]
+            obj += p.calc_obj_plat_tournee(O, c)   
+        return obj         
 
     def init_CAW_sales(self, c:list, Q:float, T_ind:int, indexes:list, Q_ind:list):
         self.sales = CAW_F(c, Q, T_ind,indexes, Q_ind)

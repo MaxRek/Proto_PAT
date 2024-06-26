@@ -7,7 +7,7 @@ import time
 import pandas as pd 
 from openrouteservice import convert
 from ..df import Df
-from src.constant import CONSOMMATION_VEHICULE ,APIKEY_OPENROUTE, PATH_IN, PATH_INSTANCE, PRIX_ESSENCE, TARIF_HORAIRE_HT, FIELDS_D
+from src.constant import APIKEY_OPENROUTE, PATH_IN, PATH_INSTANCE, PRIX_ESSENCE_100_KM, TARIF_HORAIRE_HT, FIELDS_D
 import math
 import ast
 
@@ -256,7 +256,7 @@ class Data:
         # print(type(self.c))
         # print(test)
 
-def request_c(coords,key,consommation=CONSOMMATION_VEHICULE,tarif_horaire=TARIF_HORAIRE_HT, prix = PRIX_ESSENCE):
+def request_c(coords,key,prix_esssence=PRIX_ESSENCE_100_KM,tarif_horaire=TARIF_HORAIRE_HT):
     r = 0
     try:
         body = {"locations":coords,"metrics":["distance","duration"]}
@@ -273,7 +273,7 @@ def request_c(coords,key,consommation=CONSOMMATION_VEHICULE,tarif_horaire=TARIF_
         r = np.zeros((len(durations),len(durations[0]))).tolist()
         for i in range(len(durations)):
             for j in range(len(durations[i])):
-                r[i][j]=math.ceil(durations[i][j]/60/60*tarif_horaire + distances[i][j]/100000*prix*consommation)
+                r[i][j]=math.ceil(durations[i][j]/60/60*TARIF_HORAIRE_HT + distances[i][j]/100000*PRIX_ESSENCE_100_KM)
 
     except:
         print(call.status_code)
