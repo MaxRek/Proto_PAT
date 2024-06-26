@@ -1,15 +1,24 @@
 from ...aff import Aff
 from .struct.sub_data import Sub_data
 from .init_solution import init_solution
+from .algorithm.GVNS import GVNS
+from .benchmark import *
+import os
+import datetime
+
 
 import numpy as np
 
-def control(data: Sub_data, time_limit : float = 60.0):
+def control(path:str,data: Sub_data, nb_calc : int = 20000, nb_perturb:int = 100):
     s = init_solution(data)
-    aff = Aff()
-    print(data.T)
-    temp = s.soluce_propre_to_map(data.locations, data.T-1)
-    aff.save_soluce("propre",temp[0],roads = temp[1])
-    aff.clean_M()
-    temp = s.soluce_sales_to_map(data.locations, data.T-1)
-    aff.save_soluce("sale",temp[0],roads = temp[1])
+
+    if "benchmark" not in os.listdir(path):
+        os.mkdir(path+"/benchmark")
+    
+    now = datetime.datetime.now()
+    path_bench = path+"/benchmark/"+str(now.month)+"_"+str(now.day)+" "+str(now.hour)+"-"+str(now.minute)
+    os.mkdir(path_bench)
+    
+
+    # aff = Aff()
+    GVNS(path_bench,data, s, nb_calc, nb_perturb)
