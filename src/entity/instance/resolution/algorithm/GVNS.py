@@ -41,10 +41,10 @@ def GVNS(path:str, data:Sub_data, x : Solution, lim_calc:int, lim_perturb:int,be
                             prob = [1/5,3/5,1/5]
                         rand = rd.random()
                         i = 0
-                        sum_prob = 0
+                        sum_prob = prob[i]
                         stop = False
                         while not stop and i < len(prob):
-                            sum_prob += prob[i]
+                            sum_prob += prob[i+1]
                             if sum_prob > rand:
                                 stop = True
                             else:
@@ -53,7 +53,7 @@ def GVNS(path:str, data:Sub_data, x : Solution, lim_calc:int, lim_perturb:int,be
                         xp = fonctions[i](x,data)
                     else:
                         xp = copy.deepcopy(x)
-
+                    xp.print_all_plateformes()
                     #Même si on ouvre/supprime/swap une plateforme, nous décidons au hasard de réaffecter les clients aux plateformes    
                     #S'il n'y a qu'une seule plateforme, la réaffectation n'est pas nécéssaire
                     fonctions = [N6_one,N6_some,N6_all]
@@ -80,6 +80,22 @@ def GVNS(path:str, data:Sub_data, x : Solution, lim_calc:int, lim_perturb:int,be
                     benchmark["pre_z"].append(obj_pre)
 
                     name = "VNS_"+str(nb_perturbations)+"_pre_loc_z"+str(sum(obj_pre))
+                    if len(xp.plat) > 1:
+                        xpp = N6_reaffect(xp, data)
+                    else:
+                        xpp = copy.deepcopy(xp)
+                    xpp.print_all_plateformes()
+                    benchmark["nb_plat"].append(len(xpp.plat))
+                    if k == 0:
+                        benchmark["k_VNS"].append((i))
+                    else:
+                        benchmark["k_VNS"].append((-1))
+
+                    #Sauvegarde pré VND
+                    obj_pre = xpp.calc_func_obj(data.O,data.c)
+                    benchmark["pre_z"].append(obj_pre)
+
+                    name = "VNS_"+str(nb_perturbations)+"_pre_loc_z"+str(sum(obj_pre))
                     temp = xpp.soluce_propre_to_map(data.locations, data.T-1)
                     aff.save_soluce(path+"/"+name+"_p",temp[0],roads = temp[1])
                     aff.clean_M()
@@ -92,13 +108,16 @@ def GVNS(path:str, data:Sub_data, x : Solution, lim_calc:int, lim_perturb:int,be
                     time_stop = datetime.datetime.now()-time_start
                     print(time_stop)
                     benchmark["time"].append(time_stop.seconds)
+                    time_start = datetime.datetime.now()
+                    xppp = VND(path, data, xpp, lim_calc, nb_perturbations, benchmark)
+                    benchmark["time"].append((datetime.datetime.now()-time_start).seconds)
                     # xppp.print_all_plateformes()
                     obj1 = x.calc_func_obj(data.O,data.c)
                     obj2 = xppp.calc_func_obj(data.O,data.c)
                     benchmark["z"].append(obj2)
 
                     if sum(obj1) > sum(obj2):
-                        print("xpp meilleur Solution dans voisinage de x")
+                        print("xppp meilleur Solution dans voisinage de x")
                         x = xpp
                         k = 0
                     else:
@@ -122,67 +141,76 @@ def VND(path, data:Sub_data, x : Solution, lim_calc:int, nb_perturb:int, benchma
     count_calc = 0
     aff = Aff()
     nb_modif = 0
-    benchmark["modif_k"].append([])
-    while count_calc < lim_calc:
-        k = 0
-        entry = [-1]
 
-        while k < k_max and count_calc < lim_calc:
-            print("___________________________________")
-            print("Nb actuel de calcul effectues : "+str(count_calc))
-            if count_calc < lim_calc:
-                print("Voisinage exploré k : "+str(k))
-                founded = True
-                while founded and count_calc < lim_calc:
-                    #print(entry)
+    while count_calc < lim_calc:  
+        p = -1
+        while p < len(x.plat) and count_calc < lim_calc:
+            benchmark["modif_k"].append([])
 
-                    temp = next_voisin(x, k, entry)
-                    entry = temp[1]
-                    # if type(entry[2])==int:
-                    #     print(entry)
+            k = 0
+            entry = [p]
+            while k < k_max: # and count_calc < lim_calc:
+                # print("p =  " + str(p) + ", len(x.plat) = "+ str(len(x.plat)) + ", k = " +str(k) + ", k_max = "+str(k_max)+ ", count_calc = "+str(count_calc)+", lim_calc = "+str(lim_calc))#+", entry = "+str(entry))
+                print("p =  " + str(p) + ", k = " +str(k))
+                kp = k
+                #print("___________________________________")
+                # print("Nb actuel de calcul effectues : "+str(count_calc))
+                if count_calc < lim_calc:
+                    #print("Voisinage exploré k : "+str(k))
+                    founded = True
 
-                    # elif entry[2] == 1:
-                    #     print(entry)
+                    while founded and count_calc < lim_calc and kp == k:
+                        # print("p =  " + str(p) + ", k = " +str(k)+ ", len(x.plat) = "+ str(len(x.plat)) + ", k_max = "+str(k_max)+", entry = "+str(entry))
+                        # if k == 0:
+                        # else:
+                        #     print(k)
+                        # print(entry)
+                        temp = next_voisin(x, k, entry)
+                        entry = temp[1]
+                        # print(entry)
 
-                    # print(entry)
-            
-                    #Si un voisin a été trouvé,on explore la solution
-                    founded = temp[2]
-                    if founded:
-                        if type(temp[1][2]) == int:
-                            xp = fonctions[k][0](temp[0],data,temp[1])
-                        else:
-                            xp = fonctions[k][1](temp[0],data,temp[1])
-                        obj_1 = xp.calc_func_obj(data.O,data.c)
-                        print(str(x.calc_func_obj(data.O,data.c)) + " > " +str(obj_1))
-                        if x.calc_func_obj(data.O,data.c) > obj_1:
-                            print("xp meilleur Solution dans voisinage de x")
-                            nb_modif += 1
-                            benchmark["modif_k"][-1].append([entry[0],entry[1], k])
-                            #Enregistrement solution
-                            name = "VNS_"+str(nb_perturb)+"_VND_"+str(count_calc)+"_z"+str(obj_1)
-                            temp = x.soluce_propre_to_map(data.locations, data.T-1)
-                            aff.save_soluce(path+"/"+name+"_p",temp[0],roads = temp[1])
-                            aff.clean_M()
-                            temp = x.soluce_sales_to_map(data.locations, data.T-1)
-                            aff.save_soluce(path+"/"+name+"_s",temp[0],roads = temp[1])
-                            aff.clean_M()
+                        #Si un voisin a été trouvé,on explore la solution
+                        founded = temp[2]
+                        if founded and entry[0] == p:
 
-                            x = xp
-                            k = 0
-                        #Si la modification a eu lieu dans les circuits propre d'une plateforme, nous modifions l'entrée pour recommencer l'exploration sur N1 de cette plateforme
-                            if entry[0] == -2:
-                                entry = [-1]
+                            if type(temp[1][2]) == int:
+                                xp = fonctions[k][0](temp[0],data,temp[1])
                             else:
-                                entry = [entry[0],0,0,[0,0]]
+                                xp = fonctions[k][1](temp[0],data,temp[1])
+                            obj_1 = xp.calc_func_obj(data.O,data.c)
+
+                            #print(str(x.calc_func_obj(data.O,data.c)) + " > " +str(obj_1))
+                            if x.calc_func_obj(data.O,data.c) > obj_1:
+                                # print("---------------------xp meilleur Solution dans voisinage de x---------------------")
+                                nb_modif += 1
+                                benchmark["modif_k"][-1].append([entry[0],entry[1], k])
+                                #Enregistrement solution
+                                name = "VNS_"+str(nb_perturb)+"_VND_"+str(count_calc)+"_z"+str(obj_1)
+                                temp = xp.soluce_propre_to_map(data.locations, data.T-1)
+                                aff.save_soluce(path+"/"+name+"_p",temp[0],roads = temp[1])
+                                aff.clean_M()
+                                temp = xp.soluce_sales_to_map(data.locations, data.T-1)
+                                aff.save_soluce(path+"/"+name+"_s",temp[0],roads = temp[1])
+                                aff.clean_M()
+                                x = xp
+                                k = 0
+                        #     #Si la modification a eu lieu dans les circuits propre d'une plateforme, nous modifions l'entrée pour recommencer l'exploration sur N1 de cette plateforme
+                                entry = [p,0,0,[0,0]]
+                            else:
+                                xp = x
+                        # #Sinon on change de voisinage
                         else:
-                            xp = x
-                    #Sinon on change de voisinage
-                    else:
-                        k += 1
-                        entry = [-1]
-                    count_calc += 1
-                    print("Nb actuel de calcul effectues : "+str(count_calc))
+                        #     p = entry[0]
+                            k += 1
+                            entry = [p]
+                            if k == 4:
+                                p += 1
+                            #print("NOT FOUNDED "+str(k))
+
+                        #     entry = [entry[0]]
+                        count_calc += 1
+
+                        # print("Nb actuel de calcul effectues : "+str(count_calc))
 
                 print("Founded terminé ? : "+str(founded))
                 #x.print_all_plateformes()
@@ -190,14 +218,19 @@ def VND(path, data:Sub_data, x : Solution, lim_calc:int, nb_perturb:int, benchma
             else:
                 k = k_max
                 
-            count_calc += 1
 
         
-
+            #x.print_all_plateformes()
+            if k == k_max:
+                print("KMAX ATTEINT")
+            else:
+                k = k_max
+        k += 1
         if count_calc < lim_calc:
             benchmark["non_fini"].append(False)
         else:
             benchmark["non_fini"].append(True)
         benchmark["nb_modifs"].append(nb_modif)
         count_calc = lim_calc
+        #A la fin des explorations pour une plateforme, on passe à la suivante
     return x

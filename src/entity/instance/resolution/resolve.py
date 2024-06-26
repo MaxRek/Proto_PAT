@@ -5,12 +5,30 @@ from .algorithm.GVNS import GVNS
 from .benchmark import *
 import os
 import datetime
+from .struct.solution import Solution
+from .struct.plateforme import Plateforme
+
+from.benchmark import *
+
 
 
 import numpy as np
 
-def control(path:str,data: Sub_data, nb_calc : int = 20000, nb_perturb:int = 30):
+def control(path:str,data: Sub_data, nb_calc : int = 40000, nb_perturb:int = 30):
     s = init_solution(data)
+
+    # sp = Solution()
+    # for i in range(data.N):
+    #     p = Plateforme(i)
+    #     sp.plat.append(p)
+    # for c in range(data.N, data.C):
+    #     sp.plat[0].add_client(data.d, c)
+
+    # aff = Aff()
+
+    # temp = sp.soluce_propre_to_map(data.locations, data.T-1)
+    # aff.save_soluce("propre",temp[0],roads = temp[1])
+    # aff.clean_M()
 
     if "benchmark" not in os.listdir(path):
         os.mkdir(path+"/benchmark")
@@ -30,7 +48,6 @@ def control(path:str,data: Sub_data, nb_calc : int = 20000, nb_perturb:int = 30)
     }
     os.mkdir(path_bench)
     
-
     # aff = Aff()
     GVNS(path_bench,data, s, nb_calc, nb_perturb,benchmark)
     print(benchmark)
