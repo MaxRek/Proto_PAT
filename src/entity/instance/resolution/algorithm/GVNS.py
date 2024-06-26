@@ -57,7 +57,7 @@ def GVNS(path:str, data:Sub_data, x : Solution, lim_calc:int, lim_perturb:int):
                     fonctions = [N6_one,N6_some,N6_all]
                     prob = [1/5,3/5,1/5]
                     rand = rd.random()
-<<<<<<< HEAD
+
                     j = 0
                     sum_prob = prob[j]
                     stop = False
@@ -83,25 +83,12 @@ def GVNS(path:str, data:Sub_data, x : Solution, lim_calc:int, lim_perturb:int):
                         xpp = N6_reaffect(xp, data)
                     else:
                         xpp = copy.deepcopy(xp)
-                    xpp.print_all_plateformes()
                     benchmark["nb_plat"].append(len(xpp.plat))
                     if k == 0:
                         benchmark["k_VNS"].append((i))
                     else:
                         benchmark["k_VNS"].append((-1))
-=======
-                    i = 0
-                    sum_prob = prob[i]
-                    stop = False
-                    while not stop and i+1 < len(prob):
-                        sum_prob += prob[i+1]
-                        if sum_prob > rand:
-                            stop = True
-                        else:
-                            i+= 1
-                    xpp = fonctions[i](xp,data)
->>>>>>> a4f7297064ed4200e59a1258fa8d7b653fb79185
-
+                        
                     #Sauvegarde post VND
                     name = "VNS_"+str(nb_perturbations)+"_pre_loc_z"+str(xpp.calc_func_obj(data.O,data.c))
                     temp = xpp.soluce_propre_to_map(data.locations, data.T-1)
@@ -111,7 +98,11 @@ def GVNS(path:str, data:Sub_data, x : Solution, lim_calc:int, lim_perturb:int):
                     aff.save_soluce(path+"/"+name+"_s",temp[0],roads = temp[1])
                     aff.clean_M()
 
-<<<<<<< HEAD
+                    time_start = datetime.datetime.now()
+                    xppp = VND(path, data, xpp, lim_calc, nb_perturbations, benchmark)
+                    time_stop = datetime.datetime.now()-time_start
+                    print(time_stop)
+                    benchmark["time"].append(time_stop.seconds)
                     time_start = datetime.datetime.now()
                     xppp = VND(path, data, xpp, lim_calc, nb_perturbations, benchmark)
                     time_stop = datetime.datetime.now()-time_start
@@ -120,10 +111,6 @@ def GVNS(path:str, data:Sub_data, x : Solution, lim_calc:int, lim_perturb:int):
                     time_start = datetime.datetime.now()
                     xppp = VND(path, data, xpp, lim_calc, nb_perturbations, benchmark)
                     benchmark["time"].append((datetime.datetime.now()-time_start).seconds)
-=======
-                    xppp = VND(path, data, xpp, lim_calc, nb_perturbations)
->>>>>>> a4f7297064ed4200e59a1258fa8d7b653fb79185
-                    # xppp.print_all_plateformes()
                     if x.calc_func_obj(data.O,data.c) > xppp.calc_func_obj(data.O,data.c):
                         print("xpp meilleur Solution dans voisinage de x")
                         x = xpp
@@ -214,10 +201,6 @@ def VND(path, data:Sub_data, x : Solution, lim_calc:int, nb_perturb:int):
                 k += 1                      
             else:
                 k = k_max
-<<<<<<< HEAD
-                
-
-        
             #x.print_all_plateformes()
             if k == k_max:
                 print("KMAX ATTEINT")
@@ -231,7 +214,4 @@ def VND(path, data:Sub_data, x : Solution, lim_calc:int, nb_perturb:int):
         benchmark["nb_modifs"].append(nb_modif)
         count_calc = lim_calc
         #A la fin des explorations pour une plateforme, on passe à la suivante
-=======
-            count_calc += 1
->>>>>>> a4f7297064ed4200e59a1258fa8d7b653fb79185
     return x
