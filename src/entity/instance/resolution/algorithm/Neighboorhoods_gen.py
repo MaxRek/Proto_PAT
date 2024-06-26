@@ -4,24 +4,24 @@ from..struct.sub_data import Sub_data
 
 #entry = paramètre permettant de séléctionner 
 # [
-#   index_plat : -1 pour tournées sale, 0 à nb plateforme
+#   index_plat : -2 pour tournées sale, 0 à nb plateforme
 #   index_type_tournee : 0 pour sales, 1 pour propre
 #   index_tournee : 0 à nb de tournee de tel type
 #   indexes_affect : (index_sommet à insérer, index_insertion du sommet)
 # ]
 def N1_intra_rand(x:Solution, entry:list):
-    e = [-2,-2,-2,[-2,-2]]
-    if entry[0] == -2:
+    e = [-1,-1,-1,[-1,-1]]
+    if entry[0] == -1:
         i = rd.randint(0,len(x.plat))
         if i == 0:
-            e[0] = -1
+            e[0] = -2
         else:
             e[0] = i-1
     else:
         e[0] = entry[0]
 
     print("---------------------------------------------")
-    if e[0] != -1:
+    if e[0] != -2:
         print("Plateforme numero " + str(x.plat[e[0]].numero)+ " choisi, "+str(len(x.plat[e[0]].tournees[0]))+" tournées de collecte, "+str(len(x.plat[e[0]].tournees[1]))+" tournées de livraison")
     else:
         print("Transformateur choisi, "+str(len(x.sales))+" tournées de collecte")
@@ -29,8 +29,8 @@ def N1_intra_rand(x:Solution, entry:list):
 
     #si index_type_tournée non déterminé, affectation aléatoire entre 0 pour collecte et 1 pour livraison
     #si index_plat = Transformateur, 0 assigné
-    if entry[1] == -2:
-        if e[0] == -1:
+    if entry[1] == -1:
+        if e[0] == -2:
             e[1] = 0
         else:
             e[1] = round(rd.random())
@@ -38,8 +38,8 @@ def N1_intra_rand(x:Solution, entry:list):
         e[1] = entry[1]
 
     #si index_tournée non déterminé, affectation à une tournée de type index_type_tournee
-    if entry[2] == -2:
-        if e[0] == -1:
+    if entry[2] == -1:
+        if e[0] == -2:
             #Vérification cas extreme : il n'y a qu'une tournée de sales, et il n'y a qu'un seul sommet à visiter
             if len(x.sales) == 1:
                 if x.sales[0].size == 1:
@@ -59,8 +59,8 @@ def N1_intra_rand(x:Solution, entry:list):
     else:
         e[2] = entry[2]
     
-    if entry[3][0] == -2:
-        if e[0] == -1:
+    if entry[3][0] == -1:
+        if e[0] == -2:
             e[3][0] = rd.choice(list(range(x.sales[e[2]].size)))
             e[3][1] = e[3][0]
             while e[3][1] == e[3][0]:
@@ -77,24 +77,24 @@ def N1_intra_rand(x:Solution, entry:list):
 
 #entry = paramètre permettant de séléctionner 
 # [
-#   index_plat : -1 pour tournées sale, 0 à nb plateforme
+#   index_plat : -2 pour tournées sale, 0 à nb plateforme
 #   index_type_tournee : 0 pour sales, 1 pour propre
 #   index_tournee : (0 à nb de tournee de tel type, 0 à nb de tournee de tel type)
 #   indexes_affect : (index_sommet à insérer, index_insertion du sommet)
 # ]
 def N1_inter_rand(x:Solution, entry:list):
     e = [-1,-1,[-1,-1],[-1,-1]]
-    if entry[0] == -2:
+    if entry[0] == -1:
         i = rd.randint(0,len(x.plat))
         if i == 0:
-            e[0] = -1
+            e[0] = -2
         else:
             e[0] = i-1
     else:
         e[0] = entry[0]
 
     print("___________________________________")
-    if e[0] != -1:
+    if e[0] != -2:
         print("Plateforme numero " + str(x.plat[e[0]].numero)+ " choisi, "+str(len(x.plat[e[0]].tournees[0]))+" tournées de collecte, "+str(len(x.plat[e[0]].tournees[1]))+" tournées de livraison")
     else:
         print("Transformateur choisi, "+str(len(x.sales))+" tournées de collecte")
@@ -102,8 +102,8 @@ def N1_inter_rand(x:Solution, entry:list):
 
     #si index_type_tournée non déterminé, affectation aléatoire entre 0 pour collecte et 1 pour livraison
     #si index_plat = Transformateur, 0 assigné
-    if entry[1] == -2:
-        if e[0] == -1:
+    if entry[1] == -1:
+        if e[0] == -2:
             e[1] = 0
         else:
             e[1] = round(rd.random())
@@ -111,8 +111,8 @@ def N1_inter_rand(x:Solution, entry:list):
         e[1] = entry[1]
 
     #si index_tournée non déterminé, affectation à une tournée de type index_type_tournee
-    if entry[2][0] == -2:
-        if e[0] == -1:
+    if entry[2][0] == -1:
+        if e[0] == -2:
             #Vérification cas extreme : il n'y a qu'une tournée de sales, et il n'y a qu'un seul sommet à visiter
             if len(x.sales) == 1:
                 if x.sales[0].size == 1:
@@ -136,8 +136,8 @@ def N1_inter_rand(x:Solution, entry:list):
     else:
         e[2] = entry[2]
     
-    if entry[3] == -2:
-        if e[0] == -1:
+    if entry[3] == -1:
+        if e[0] == -2:
             e[3] = rd.choice(list(range(x.sales[e[2][0]].size)))
         else:
             e[3] = rd.choice(list(range(x.plat[e[0]].tournees[e[1]][e[2][0]].size)))
@@ -148,33 +148,33 @@ def N1_inter_rand(x:Solution, entry:list):
 #SWAP intra_tournee
 #entry = paramètre permettant de séléctionner 
 # [
-#   index_plat : -1 pour tournées sale, 0 à nb plateforme
+#   index_plat : -2 pour tournées sale, 0 à nb plateforme
 #   index_type_tournee : 0 pour sales, 1 pour propre
 #   index_tournee : 0 à nb de tournee de tel type
 #   indexes_affect : (index_sommet à swap, index_sommet à swap)
 # ]
 def N2_intra_rand(x:Solution, entry:list):
     e = [-1,-1,-1,[-1,-1]]
-    if entry[0] == -2:
+    if entry[0] == -1:
         i = rd.randint(0,len(x.plat))
         if i == 0:
-            e[0] = -1
+            e[0] = -2
         else:
             e[0] = i-1
     else:
         e[0] = entry[0]
 
-    # print("---------------------------------------------")
-    # if e[0] != -1:
-        # print("Plateforme numero " + str(x.plat[e[0]].numero)+ " choisi, "+str(len(x.plat[e[0]].tournees[0]))+" tournées de collecte, "+str(len(x.plat[e[0]].tournees[1]))+" tournées de livraison")
-    # else:
-        # print("Transformateur choisi, "+str(len(x.sales))+" tournées de collecte")
-    # print("---------------------------------------------")
+    print("---------------------------------------------")
+    if e[0] != -2:
+        print("Plateforme numero " + str(x.plat[e[0]].numero)+ " choisi, "+str(len(x.plat[e[0]].tournees[0]))+" tournées de collecte, "+str(len(x.plat[e[0]].tournees[1]))+" tournées de livraison")
+    else:
+        print("Transformateur choisi, "+str(len(x.sales))+" tournées de collecte")
+    print("---------------------------------------------")
 
     #si index_type_tournée non déterminé, affectation aléatoire entre 0 pour collecte et 1 pour livraison
     #si index_plat = Transformateur, 0 assigné
-    if entry[1] == -2:
-        if e[0] == -1:
+    if entry[1] == -1:
+        if e[0] == -2:
             e[1] = 0
         else:
             e[1] = round(rd.random())
@@ -182,8 +182,8 @@ def N2_intra_rand(x:Solution, entry:list):
         e[1] = entry[1]
 
     #si index_tournée non déterminé, affectation à une tournée de type index_type_tournee
-    if entry[2] == -2:
-        if e[0] == -1:
+    if entry[2] == -1:
+        if e[0] == -2:
             #Vérification cas extreme : il n'y a qu'une tournée de sales, et il n'y a qu'un seul sommet à visiter
             if len(x.sales) == 1:
                 if x.sales[0].size == 1:
@@ -203,8 +203,8 @@ def N2_intra_rand(x:Solution, entry:list):
     else:
         e[2] = entry[2]
     
-    if entry[3][0] == -2:
-        if e[0] == -1:
+    if entry[3][0] == -1:
+        if e[0] == -2:
             e[3][0] = rd.choice(list(range(x.sales[e[2]].size)))
             e[3][1] = e[3][0]
             while e[3][1] == e[3][0]:
@@ -221,7 +221,7 @@ def N2_intra_rand(x:Solution, entry:list):
 #SWAP inter_tournee
 #entry = paramètre permettant de séléctionner 
 # [
-#   index_plat : -1 pour tournées sale, 0 à nb plateforme
+#   index_plat : -2 pour tournées sale, 0 à nb plateforme
 #   index_type_tournee : 0 pour sales, 1 pour propre
 #   index_tournee : (0 à nb de tournee de tel type,0 à nb de tournee de tel type)
 #   indexes_affect : (index_sommet à swap, index_sommet à swap)
@@ -229,26 +229,26 @@ def N2_intra_rand(x:Solution, entry:list):
 
 def N2_inter_rand(x:Solution, entry:list):
     e = [-1,-1,[-1,-1],[-1,-1]]
-    if entry[0] == -2:
+    if entry[0] == -1:
         i = rd.randint(0,len(x.plat))
         if i == 0:
-            e[0] = -1
+            e[0] = -2
         else:
             e[0] = i-1
     else:
         e[0] = entry[0]
 
-    # print("---------------------------------------------")
-    # if e[0] != -1:
-    #     print("Plateforme numero " + str(x.plat[e[0]].numero)+ " choisi, "+str(len(x.plat[e[0]].tournees[0]))+" tournées de collecte, "+str(len(x.plat[e[0]].tournees[1]))+" tournées de livraison")
-    # else:
-    #     print("Transformateur choisi, "+str(len(x.sales))+" tournées de collecte")
-    # print("---------------------------------------------")
+    print("---------------------------------------------")
+    if e[0] != -2:
+        print("Plateforme numero " + str(x.plat[e[0]].numero)+ " choisi, "+str(len(x.plat[e[0]].tournees[0]))+" tournées de collecte, "+str(len(x.plat[e[0]].tournees[1]))+" tournées de livraison")
+    else:
+        print("Transformateur choisi, "+str(len(x.sales))+" tournées de collecte")
+    print("---------------------------------------------")
 
     #si index_type_tournée non déterminé, affectation aléatoire entre 0 pour collecte et 1 pour livraison
     #si index_plat = Transformateur, 0 assigné
-    if entry[1] == -2:
-        if e[0] == -1:
+    if entry[1] == -1:
+        if e[0] == -2:
             e[1] = 0
         else:
             e[1] = round(rd.random())
@@ -256,8 +256,8 @@ def N2_inter_rand(x:Solution, entry:list):
         e[1] = entry[1]
 
     #si index_tournée non déterminé, affectation à une tournée de type index_type_tournee
-    if entry[2][0] == -2:
-        if e[0] == -1:
+    if entry[2][0] == -1:
+        if e[0] == -2:
             #Vérification cas extreme : il n'y a qu'une tournée de sales, et il n'y a qu'un seul sommet à visiter
             if len(x.sales) == 1:
                 if x.sales[0].size == 1:
@@ -281,8 +281,8 @@ def N2_inter_rand(x:Solution, entry:list):
     else:
         e[2] = entry[2]
     
-    if entry[3][0] == -2:
-        if e[0] == -1:
+    if entry[3][0] == -1:
+        if e[0] == -2:
             e[3][0] = rd.choice(list(range(x.sales[e[2][0]].size)))
             e[3][1] = rd.choice(list(range(x.sales[e[2][1]].size)))
         else:
@@ -295,24 +295,24 @@ def N2_inter_rand(x:Solution, entry:list):
 #EXTENDED OR_OPT intra_tournee
 #entry = paramètre permettant de séléctionner 
 # [
-#   index_plat : -1 pour tournées sale, 0 à nb plateforme
+#   index_plat : -2 pour tournées sale, 0 à nb plateforme
 #   index_type_tournee : 0 pour sales, 1 pour propre
 #   index_tournee : 0 à nb de tournee de tel type
 #   indexes_affect : ([index_debut seq, index_fin seq], index où inserer seq)
 # ]
 def N3_intra_rand(x:Solution, entry:list = [-1,-1,-1,[[-1,-1],-1]]):
     e = [-1,-1,-1,[[-1,-1],-1]]
-    if entry[0] == -2:
+    if entry[0] == -1:
         i = rd.randint(0,len(x.plat))
         if i == 0:
-            e[0] = -1
+            e[0] = -2
         else:
             e[0] = i-1
     else:
         e[0] = entry[0]
 
     print("---------------------------------------------")
-    if e[0] != -1:
+    if e[0] != -2:
         print("Plateforme numero " + str(x.plat[e[0]].numero)+ " choisi, "+str(len(x.plat[e[0]].tournees[0]))+" tournées de collecte, "+str(len(x.plat[e[0]].tournees[1]))+" tournées de livraison")
     else:
         print("Transformateur choisi, "+str(len(x.sales))+" tournées de collecte")
@@ -320,8 +320,8 @@ def N3_intra_rand(x:Solution, entry:list = [-1,-1,-1,[[-1,-1],-1]]):
 
     #si index_type_tournée non déterminé, affectation aléatoire entre 0 pour collecte et 1 pour livraison
     #si index_plat = Transformateur, 0 assigné
-    if entry[1] == -2:
-        if e[0] == -1:
+    if entry[1] == -1:
+        if e[0] == -2:
             e[1] = 0
         else:
             e[1] = round(rd.random())
@@ -329,8 +329,8 @@ def N3_intra_rand(x:Solution, entry:list = [-1,-1,-1,[[-1,-1],-1]]):
         e[1] = entry[1]
 
     #si index_tournée non déterminé, affectation à une tournée de type index_type_tournee
-    if entry[2] == -2:
-        if e[0] == -1:
+    if entry[2] == -1:
+        if e[0] == -2:
             e[2] = rd.choice(list(range(len(x.sales))))
             while x.sales[e[2]].size < 3:
                 e[2] = rd.choice(list(range(len(x.sales))))
@@ -341,8 +341,8 @@ def N3_intra_rand(x:Solution, entry:list = [-1,-1,-1,[[-1,-1],-1]]):
     else:
         e[2] = entry[2]
     
-    if entry[3][0][0] == -2:
-        if e[0] == -1:
+    if entry[3][0][0] == -1:
+        if e[0] == -2:
             e[3][0][0] = rd.choice(list(range(x.sales[e[2]].size-1)))
             e[3][0][1] = e[3][0][0]
             while e[3][0][1] == e[3][0][0]:
@@ -361,8 +361,8 @@ def N3_intra_rand(x:Solution, entry:list = [-1,-1,-1,[[-1,-1],-1]]):
     else:
         e[3][0] = entry[3][0]
     
-    if entry[3][1] == -2 :
-        if e[0] == -1:
+    if entry[3][1] == -1 :
+        if e[0] == -2:
             # x.sales[e[2]].print_tournee()
             # print(x.sales[e[2]].size)
             # print(i)
@@ -378,17 +378,17 @@ def N3_intra_rand(x:Solution, entry:list = [-1,-1,-1,[[-1,-1],-1]]):
 #EXTENDED OR_OPT inter_tournee
 #entry = paramètre permettant de séléctionner 
 # [
-#   index_plat : -1 pour tournées sale, 0 à nb plateforme
+#   index_plat : -2 pour tournées sale, 0 à nb plateforme
 #   index_type_tournee : 0 pour sales, 1 pour propre
 #   index_tournee : (0 à nb de tournee de tel type, 0 à nb de tournee de tel type)
 #   indexes_affect : ([index_debut seq, index_fin seq], index où inserer seq dans t2)
 # ]
 def N3_inter_rand(x:Solution, entry:list = [-1,-1,[-1,-1],[[-1,-1],-1]]):
-    
+    print(entry[3])
 
     e = [-1,-1,[-1,-1],[[-1,-1],-1]]
 
-    if entry[0] == -2:
+    if entry[0] == -1:
         i = rd.randint(0,len(x.plat))
         if i == 0:
             if len(x.sales)>1:
@@ -401,7 +401,7 @@ def N3_inter_rand(x:Solution, entry:list = [-1,-1,[-1,-1],[[-1,-1],-1]]):
                     j+= 1
                 t += 1
                 if count == 2:
-                    e[0] = -1
+                    e[0] = -2
                 else:
                     i = rd.randint(0,len(x.plat))
             else:
@@ -428,7 +428,7 @@ def N3_inter_rand(x:Solution, entry:list = [-1,-1,[-1,-1],[[-1,-1],-1]]):
         e[0] = entry[0]
 
     print("---------------------------------------------")
-    if e[0] != -1:
+    if e[0] != -2:
         print("Plateforme numero " + str(x.plat[e[0]].numero)+ " choisi (index : "+str(e[0])+"), "+str(len(x.plat[e[0]].tournees[0]))+" tournées de collecte, "+str(len(x.plat[e[0]].tournees[1]))+" tournées de livraison")
     else:
         print("Transformateur choisi, "+str(len(x.sales))+" tournées de collecte")
@@ -436,8 +436,8 @@ def N3_inter_rand(x:Solution, entry:list = [-1,-1,[-1,-1],[[-1,-1],-1]]):
 
     #si index_type_tournée non déterminé, affectation aléatoire entre 0 pour collecte et 1 pour livraison
     #si index_plat = Transformateur, 0 assigné
-    if entry[1] == -2:
-        if e[0] == -1:
+    if entry[1] == -1:
+        if e[0] == -2:
             e[1] = 0
         else:
             e[1] = round(rd.random())
@@ -464,8 +464,8 @@ def N3_inter_rand(x:Solution, entry:list = [-1,-1,[-1,-1],[[-1,-1],-1]]):
             e[1] = entry[1]
 
     #si index_tournée non déterminé, affectation à une tournée de type index_type_tournee
-    if entry[2][0] == -2:
-        if e[0] == -1:
+    if entry[2][0] == -1:
+        if e[0] == -2:
             if len(x.sales) > 1:
                 e[2][0] = rd.choice(list(range(len(x.sales))))
                 e[2][1] = rd.choice([i for i, j in enumerate(list(range(len(x.sales)))) if j != e[2][0]])
@@ -492,8 +492,8 @@ def N3_inter_rand(x:Solution, entry:list = [-1,-1,[-1,-1],[[-1,-1],-1]]):
                 print("Erreur : Mauvaise affectation a une plateforme et un type où il y a une seule tournée")
                 return ValueError    
 
-    if entry[3][0][0] == -2:
-        if e[0] == -1:
+    if entry[3][0][0] == -1:
+        if e[0] == -2:
             # x.sales[e[2][0]].print_tournee()
             if x.sales[e[2][0]].size == 1:
                 e[3][0][0] = 0
@@ -516,8 +516,8 @@ def N3_inter_rand(x:Solution, entry:list = [-1,-1,[-1,-1],[[-1,-1],-1]]):
     else:
         e[3][0] = entry[3][0]
     
-    if entry[3][1] == -2 :
-        if e[0] == -1:
+    if entry[3][1] == -1 :
+        if e[0] == -2:
             # x.sales[e[2][0]].print_tournee()
             # x.sales[e[2][1]].print_tournee()
             e[3][1] = rd.choice(list(range(x.sales[e[2][1]].size)))
@@ -531,7 +531,7 @@ def N3_inter_rand(x:Solution, entry:list = [-1,-1,[-1,-1],[[-1,-1],-1]]):
 def N5_add_rand(x:Solution, N:int, entry = [-1]):
     e = [-1]
 
-    if entry[0] == -2:
+    if entry[0] == -1:
         numero_plat_ouvertes = []
         for i in range(len(x.plat)):
             numero_plat_ouvertes.append(x.plat[i].numero)
@@ -544,7 +544,7 @@ def N5_add_rand(x:Solution, N:int, entry = [-1]):
 
 def N5_del_rand(x:Solution, N:int, entry = [-1]):
     e = [-1]
-    if entry[0] == -2:
+    if entry[0] == -1:
         e[0] = rd.choice(list(range(len(x.plat))))
     else:
         e[0] = entry[0]
@@ -553,12 +553,12 @@ def N5_del_rand(x:Solution, N:int, entry = [-1]):
 
 def N5_swap_rand(x:Solution, N:int, entry = [-1,-1]):
     e = [-1,-1]
-    if entry[0] == -2:
+    if entry[0] == -1:
         e[0] = rd.choice(list(range(len(x.plat))))
     else:
         e[0] = entry[0]
 
-    if entry[1] == -2:
+    if entry[1] == -1:
         numero_plat_ouvertes = []
         for i in range(len(x.plat)):
             numero_plat_ouvertes.append(x.plat[i].numero)
@@ -570,7 +570,8 @@ def N5_swap_rand(x:Solution, N:int, entry = [-1,-1]):
 
 def N6_one_rand(x:Solution, C:int, N:int, entry = [-1,-1]):
     e = [-1,-1]
-    if entry[0] == -2:
+    if entry[0] == -1:
+        print(list(range(N,C)))
         e[0] = rd.choice(list(range(N,C)))
     else:
         e[0] = entry[0]
@@ -580,8 +581,9 @@ def N6_one_rand(x:Solution, C:int, N:int, entry = [-1,-1]):
 def N6_some_rand(x:Solution, C:int, N:int, entry = [[-1],[-1]]):
     e = [[],[]]
     
-    nb = rd.choice(range(2,C-N))
+    nb = rd.choice(range(C-N))
     while(len(e[0]) < nb):
+        print(e[0])
         c = rd.choice(range(C-N))
         if c not in e[0]:
             e[0].append(c+N)
