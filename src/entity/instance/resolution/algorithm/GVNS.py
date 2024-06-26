@@ -41,10 +41,10 @@ def GVNS(path:str, data:Sub_data, x : Solution, lim_calc:int, lim_perturb:int,be
                             prob = [1/5,3/5,1/5]
                         rand = rd.random()
                         i = 0
-                        sum_prob = prob[i]
+                        sum_prob = 0
                         stop = False
                         while not stop and i < len(prob):
-                            sum_prob += prob[i+1]
+                            sum_prob += prob[i]
                             if sum_prob > rand:
                                 stop = True
                             else:
@@ -53,9 +53,33 @@ def GVNS(path:str, data:Sub_data, x : Solution, lim_calc:int, lim_perturb:int,be
                         xp = fonctions[i](x,data)
                     else:
                         xp = copy.deepcopy(x)
-                    xp.print_all_plateformes()
+
                     #Même si on ouvre/supprime/swap une plateforme, nous décidons au hasard de réaffecter les clients aux plateformes    
                     #S'il n'y a qu'une seule plateforme, la réaffectation n'est pas nécéssaire
+                    fonctions = [N6_one,N6_some,N6_all]
+                    prob = [1/5,3/5,1/5]
+                    rand = rd.random()
+                    j = 0
+                    sum_prob = prob[j]
+                    stop = False
+                    while not stop and j+1 < len(prob):
+                        sum_prob += prob[j+1]
+                        if sum_prob > rand:
+                            stop = True
+                        else:
+                            j+= 1
+                    xpp = fonctions[j](xp,data)
+                    benchmark["nb_plat"].append(len(xpp.plat))
+                    if k == 0:
+                        benchmark["k_VNS"].append((i,j))
+                    else:
+                        benchmark["k_VNS"].append((-1,j))
+
+                    #Sauvegarde pré VND
+                    obj_pre = xpp.calc_func_obj(data.O,data.c)
+                    benchmark["pre_z"].append(obj_pre)
+
+                    name = "VNS_"+str(nb_perturbations)+"_pre_loc_z"+str(sum(obj_pre))
                     if len(xp.plat) > 1:
                         xpp = N6_reaffect(xp, data)
                     else:
@@ -79,6 +103,11 @@ def GVNS(path:str, data:Sub_data, x : Solution, lim_calc:int, lim_perturb:int,be
                     aff.save_soluce(path+"/"+name+"_s",temp[0],roads = temp[1])
                     aff.clean_M()
 
+                    time_start = datetime.datetime.now()
+                    xppp = VND(path, data, xpp, lim_calc, nb_perturbations, benchmark)
+                    time_stop = datetime.datetime.now()-time_start
+                    print(time_stop)
+                    benchmark["time"].append(time_stop.seconds)
                     time_start = datetime.datetime.now()
                     xppp = VND(path, data, xpp, lim_calc, nb_perturbations, benchmark)
                     benchmark["time"].append((datetime.datetime.now()-time_start).seconds)
