@@ -39,7 +39,7 @@ instance.data.Q = 1200
 instance.save_instance()
 
 red = reduction(instance)
-control(PATH_IN+"/"+PATH_INSTANCE+"/didactic/",red[0])
+control(red[0],red[1])
 
 #print(len(instance.data.c))
 # instance.data.gen_c()

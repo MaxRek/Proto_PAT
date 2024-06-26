@@ -31,7 +31,7 @@ class Instance:
                 temp_prod = json.load(f)
                 self.prod = dict(temp_prod)
         self.data.load_data(PATH_IN+"/"+PATH_INSTANCE+"/",self.name)
-        #self.dec.load_dec(PATH_IN+"/"+PATH_INSTANCE+"/"+self.name+"/","dec")
+        self.dec.load_dec(PATH_IN+"/"+PATH_INSTANCE+"/"+self.name+"/","dec")
 
     def save_instance(self):
         #print(self.prod)
@@ -46,4 +46,4 @@ class Instance:
             f.write(json.dumps(self.prod, indent=4))
 
         self.data.save_data(PATH_IN+"/"+PATH_INSTANCE+"/",self.name)
-        #self.dec.save_dec(PATH_IN+"/"+PATH_INSTANCE+"/"+self.name+"/","dec")
+        self.dec.save_dec(PATH_IN+"/"+PATH_INSTANCE+"/"+self.name+"/","dec")
