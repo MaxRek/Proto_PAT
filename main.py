@@ -15,8 +15,8 @@ from src.entity.instance.instance import Instance
 
 truc = Aff()
 truc.df.load_csv(path=PATH_IN+"/"+PATH_INSTANCE+"/didactic/",e_name="e",f_name="f",n_name="n",t_name="t")
-# truc.add_point(truc.df)
-# truc.M.save("Map_PAT_t.ht#ml")
+truc.add_point(truc.df)
+truc.M.save("Map_PAT_t.ht#ml")
 # truc.df.load_csv("in/instance/didactic/","e","f","n")
 
 Prod = {"S":["Legumes"],"P":["Viandes","Legumineuses","Laitages"]}
@@ -34,7 +34,9 @@ instance.name = "didactic"
 
 #demandFiller_Dcpf(PATH_IN+"/"+PATH_INSTANCE+"/",instance.name+"/e",instance.name+"/f", instance.name+"/d",mult = mult, multi_f=multi_f, ratio_p=ratio_p, ratio_pc= ratio_pc)
 instance.load_instance()
-instance.data.Q = 1200
+# instance.data.Q = 1200
+# instance.data.gen_c()
+
 #print(instance.data.d)
 instance.save_instance()
 
@@ -42,7 +44,6 @@ red = reduction(instance)
 control(PATH_IN+"/"+PATH_INSTANCE+"/didactic/",red[0])
 
 #print(len(instance.data.c))
-# instance.data.gen_c()
 # instance.save_instance()
 # print(instance.data.d)
 # print(reduction(instance)[0].d)

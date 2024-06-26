@@ -9,7 +9,6 @@ def reduction(inst:Instance):
     indexes_loc = [[],[]]
     sub_tsp = []
 
-
     #Récupération des clients ayant passé commande
     indexes_loc[0] = list(inst.data.d.keys())
 

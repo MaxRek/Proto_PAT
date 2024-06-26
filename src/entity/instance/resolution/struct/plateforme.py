@@ -247,6 +247,7 @@ class Plateforme:
             xp += t.calc_obj_tournee(c)
         for t in self.tournees[1]:
             xp += t.calc_obj_tournee(c)
+        xp += c[self.numero][-1]*2
         return [O,xp]
 
     def get_cli(self):

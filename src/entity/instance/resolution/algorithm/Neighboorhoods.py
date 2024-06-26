@@ -596,6 +596,11 @@ def N6_reaffect(x:Solution, data:Sub_data):
             min_c.append(data.c[p.numero][c])
         xp.plat[min_c.index(min(min_c))].add_client(data.d,c)
 
+    for p in xp.plat:
+        p.calc_LnfPT_c(data.d, data.C, data.F, data.T,data.T, data.Q)
+        
+    xp.init_CAW_cp(data.c, data.Q, data.C)
+    xp.init_CAW_lp(data.c, data.Q, data.D, data.F)
     # xp.init_CAW_cp(data.C, data.Q, data.C)
     # xp.init_CAW_lp(data.c, data.Q, data.d, data.F)
     xp.repair_solution_post_N6(data)
