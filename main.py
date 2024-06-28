@@ -4,10 +4,10 @@ import numpy as np
 sys.path.insert(0, '')
 from src.scripts.findLatLong import replaceLatLong
 from src.scripts.demandFiller import demandFiller_Dcf, demandFiller_Dcpf,gen_O
-from src.constant import PATH_DATA, PATH_FILE_E, SUB_DEMAND, PATH_IN, PATH_INSTANCE
-from src.entity.instance.resolution.pre_resolve import reduction
-from src.entity.instance.resolution.init_solution import init_solution
-from src.entity.instance.resolution.resolve import control
+from src.constant import PATH_DATA, PATH_FILE_E, SUB_DEMAND, PATH_IN, PATH_OUT, PATH_INSTANCE
+from src.resolution.pre_resolve import reduction
+from src.resolution.init_solution import init_solution
+from src.resolution.resolve import control
 
 from src.entity.aff import Aff
 from src.entity.instance.instance import Instance
@@ -39,7 +39,7 @@ instance.data.Q = 1200
 instance.save_instance()
 
 red = reduction(instance)
-control(PATH_IN+"/"+PATH_INSTANCE+"/"+instance.name,red[0])
+control(PATH_OUT,instance.name,red[0])
 
 #print(len(instance.data.c))
 # instance.data.gen_c()

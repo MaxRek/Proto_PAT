@@ -1,8 +1,9 @@
-from ..instance import Instance
-from ..instance import Dec
+from ..entity.instance.instance import Instance
+from ..entity.instance.decision import Dec
 from .struct.sub_data import Sub_data
 from.tools import sub_matrix
 
+import math
 import numpy as np
 
 def reduction(inst:Instance):

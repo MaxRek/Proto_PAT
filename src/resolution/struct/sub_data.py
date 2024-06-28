@@ -1,4 +1,4 @@
-from ....df import Df
+from ...entity.df import Df
 
 import numpy as np
 

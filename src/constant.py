@@ -6,6 +6,7 @@ LOC_BRIERE = [47.37412011769598, -2.234728966487376]
 
 #Path
 PATH_IN = "in"
+PATH_OUT = "out"
 PATH_DATA = "data"
 PATH_INSTANCE = "instance"
 PATH_FILE_F = "Fournisseurs"

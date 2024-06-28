@@ -1,4 +1,4 @@
-from ...aff import Aff
+from ..entity.aff import Aff
 from .struct.sub_data import Sub_data
 from .init_solution import init_solution
 import datetime
@@ -8,17 +8,17 @@ from .benchmark import *
 
 import numpy as np
 
-def control(path:str,data: Sub_data, nb_calc : int = 10000, nb_perturb:int = 5):
+def control(path:str,name:str,data: Sub_data, nb_calc : int = 10000, nb_perturb:int = 5):
     print(path)
     print(data)
     
     s = init_solution(data)
 
-    if "benchmark" not in os.listdir(path):
-        os.mkdir(path+"/benchmark")
+    if name not in os.listdir(path):
+        os.mkdir(path+"/"+name)
     
     now = datetime.datetime.now()
-    path_bench = path+"/benchmark/"+str(now.month)+"_"+str(now.day)+" "+str(now.hour)+"-"+str(now.minute)
+    path_bench = path+"/"+name+"/"+str(now.month)+"_"+str(now.day)+" "+str(now.hour)+"-"+str(now.minute)
     os.mkdir(path_bench)
     benchmark = {
         "pre_z":[],

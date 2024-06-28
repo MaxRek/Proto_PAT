@@ -1,6 +1,6 @@
 from..struct.solution import Solution
 from..struct.sub_data import Sub_data
-from....aff import Aff
+from...entity.aff import Aff
 from..algorithm.Neighboorhoods import *
 from..algorithm.Neighboorhoods_next import *
 import datetime
@@ -53,7 +53,7 @@ def GVNS(path:str, data:Sub_data, x : Solution, lim_calc:int, lim_perturb:int,be
                         xp = fonctions[i](x,data)
                     else:
                         xp = copy.deepcopy(x)
-                    xp.print_all_plateformes()
+                    #xp.print_all_plateformes()
                     #Même si on ouvre/supprime/swap une plateforme, nous décidons au hasard de réaffecter les clients aux plateformes    
                     #S'il n'y a qu'une seule plateforme, la réaffectation n'est pas nécéssaire
                     fonctions = [N6_one,N6_some,N6_all]
@@ -79,12 +79,11 @@ def GVNS(path:str, data:Sub_data, x : Solution, lim_calc:int, lim_perturb:int,be
                     obj_pre = xpp.calc_func_obj(data.O,data.c)
                     benchmark["pre_z"].append(obj_pre)
 
-                    name = "VNS_"+str(nb_perturbations)+"_pre_loc_z"+str(sum(obj_pre))
                     if len(xp.plat) > 1:
                         xpp = N6_reaffect(xp, data)
                     else:
                         xpp = copy.deepcopy(xp)
-                    xpp.print_all_plateformes()
+                    #xpp.print_all_plateformes()
                     benchmark["nb_plat"].append(len(xpp.plat))
                     if k == 0:
                         benchmark["k_VNS"].append((i))
@@ -103,11 +102,6 @@ def GVNS(path:str, data:Sub_data, x : Solution, lim_calc:int, lim_perturb:int,be
                     aff.save_soluce(path+"/"+name+"_s",temp[0],roads = temp[1])
                     aff.clean_M()
 
-                    time_start = datetime.datetime.now()
-                    xppp = VND(path, data, xpp, lim_calc, nb_perturbations, benchmark)
-                    time_stop = datetime.datetime.now()-time_start
-                    print(time_stop)
-                    benchmark["time"].append(time_stop.seconds)
                     time_start = datetime.datetime.now()
                     xppp = VND(path, data, xpp, lim_calc, nb_perturbations, benchmark)
                     benchmark["time"].append((datetime.datetime.now()-time_start).seconds)
@@ -206,7 +200,7 @@ def VND(path, data:Sub_data, x : Solution, lim_calc:int, nb_perturb:int, benchma
                                 p += 1
                             #print("NOT FOUNDED "+str(k))
 
-                        #     entry = [entry[0]]
+                        #     entry = [entry[0]]F
                         count_calc += 1
 
                         # print("Nb actuel de calcul effectues : "+str(count_calc))
