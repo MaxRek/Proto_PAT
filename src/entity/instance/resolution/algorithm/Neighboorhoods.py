@@ -551,10 +551,6 @@ def N6_some(x:Solution, data:Sub_data, entry = [[-1],[-1]]):
     for s in range(len(entry[0])):
         found = False
         i = 0
-<<<<<<< HEAD
-=======
-        
->>>>>>> a4f7297064ed4200e59a1258fa8d7b653fb79185
         while not found and i < len(x.plat):
             if e[0][s] in xp.plat[i].cli_affect:
                 found = True
@@ -584,5 +580,25 @@ def N6_all(x:Solution, data:Sub_data):
 
     xp.repair_solution_post_N6(data)
 
+
+    return xp
+
+def N6_reaffect(x:Solution, data:Sub_data):
+    xp = copy.deepcopy(x)
+    for p in xp.plat:
+        p.cli_affect.clear()
+        p.pt_affect.clear()
+        p.tournees[0].clear()
+        p.tournees[1].clear()
+
+    for c in range(data.N,data.C):
+        min_c = []
+        for p in xp.plat:
+            min_c.append(data.c[p.numero][c])
+        xp.plat[min_c.index(min(min_c))].add_client(data.d,c)
+
+    # xp.init_CAW_cp(data.C, data.Q, data.C)
+    # xp.init_CAW_lp(data.c, data.Q, data.d, data.F)
+    xp.repair_solution_post_N6(data)
 
     return xp

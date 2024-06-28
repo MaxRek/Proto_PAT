@@ -101,11 +101,15 @@ class Solution:
     
     def calc_func_obj(self,O:list, c:list):
         obj = 0
+        sum_temp = [0,0]
         for t in self.sales:
             obj += t.calc_obj_tournee(c)
         for p in self.plat:
-            obj += p.calc_obj_plat_tournee(O, c)   
-        return obj         
+            temp = p.calc_obj_plat_tournee(O,c)
+            sum_temp[0] += temp[0]
+            sum_temp[1] += temp[1]
+
+        return [obj, sum_temp[1], sum_temp[0]]         
 
     def init_CAW_sales(self, c:list, Q:float, T_ind:int, indexes:list, Q_ind:list):
         self.sales = CAW_F(c, Q, T_ind,indexes, Q_ind)
