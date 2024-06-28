@@ -29,21 +29,21 @@ def all_bar_obj(obj:list,pre_obj:list, calc_bool:list, names:list):
     for i in range(len(obj)):
         if max_z < sum(pre_obj[i]):
             max_z = sum(pre_obj[i])
-        xs[0].append(pre_obj[i][2])
+        xs[0].append(pre_obj[i][0])
         xn[0].append(pre_obj[i][1])
-        On[0].append(pre_obj[i][0])
-        xs[0].append(obj[i][2])
+        On[0].append(pre_obj[i][2])
+        xs[0].append(obj[i][0])
         xn[0].append(obj[i][1])
-        On[0].append(obj[i][0])
+        On[0].append(obj[i][2])
         sum_obj.append(obj[i][0]+obj[i][1]+obj[i][2])
         sum_pre_obj.append(pre_obj[i][0]+pre_obj[i][1]+pre_obj[i][2])
 
-        xs[1].append(pre_obj[i][2])
+        xs[1].append(pre_obj[i][0])
         xn[1].append(pre_obj[i][1])
-        On[1].append(pre_obj[i][0])
-        xs[2].append(obj[i][2])
+        On[1].append(pre_obj[i][2])
+        xs[2].append(obj[i][0])
         xn[2].append(obj[i][1])
-        On[2].append(obj[i][0])
+        On[2].append(obj[i][2])
 
     titles = ["z pré/post RL","z pré RL","z post RL"]
     #print(On)
