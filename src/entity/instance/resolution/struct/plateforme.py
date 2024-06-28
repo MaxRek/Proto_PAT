@@ -127,6 +127,18 @@ class Plateforme:
             qt_c.append(t.load)
         return (b, ind_c, qt_c)
     
+<<<<<<< HEAD
+    def calc_obj_plat_tournee(self,O:list, c:list): 
+        xp = 0
+        #print(O[self.numero])
+        for t in self.tournees[0]:
+            xp += t.calc_obj_tournee(c)
+        for t in self.tournees[1]:
+            xp += t.calc_obj_tournee(c)
+
+        xp += self.xT*c[self.numero][-1]*2
+        return [O[self.numero],xp]
+=======
     def calc_obj_plat_tournee(self,O:list, c:list):
         obj = 0
         obj += O[self.numero]
@@ -137,6 +149,7 @@ class Plateforme:
             obj += t.calc_obj_tournee(c)
         return obj
 
+>>>>>>> resolve
 
     def get_cli(self):
         return self.cli_affect
