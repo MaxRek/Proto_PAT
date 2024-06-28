@@ -150,6 +150,8 @@ def plot_time(time:list,calc_bool:list, name:str):
     ax.set_ylabel("Temps (en secondes)")
     handles, labels = ax.get_legend_handles_labels()
     ax.legend(handles, labels)
+    ax.xaxis.set_major_locator(ticker.MultipleLocator(base=1)) 
+
     
     fig.show()
     fig.savefig(name+".png")

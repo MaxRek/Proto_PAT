@@ -55,8 +55,8 @@ def CAW_F(c:list, Q:float, dep:int ,indexes:list, Q_ind:list):
                 temp_sub_Q.append(Q_ind[indexes.index(sommet)])
             r1.add_point(r2.order, temp_sub_Q)
             r.pop(i_S[order_i_S[i]][1])
-        else:
-            print("pas de changement, fin d'algo")
+        # else:
+        #     print("pas de changement, fin d'algo")
 
     # for m in range(len(r)):
     #     r[m].print_tournee()

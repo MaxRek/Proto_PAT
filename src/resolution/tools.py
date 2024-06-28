@@ -55,11 +55,6 @@ def get_sum_qt_p_by_rev_d(rev_d:dict, p:int, f:int):
 #Récupère toutes les quantités demandés par un client c
 def get_sum_qt_c_by_d(d:dict, c:int, f:int):
     sum = np.zeros(f).tolist()
-    print(c)
-    print("---------------------")
-    print(d)
-    print("---------------------")
-    print(d[c])
     for key in d[c]:
         for values in d[c][key]:
             sum[values[0]] += values[1]

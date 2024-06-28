@@ -4,8 +4,7 @@ from..struct.plateforme import Plateforme
 from..struct.tournee import Tournee
 import copy
 # from numpy import random as rd
-import time
-from ..tools import rand_ind_in_list, reduct_LnfPT, calc_LnfPT_c, get_fs_prod_ind_qt, get_sum_qt_c_l_by_d
+from ..tools import reduct_LnfPT, get_fs_prod_ind_qt, get_sum_qt_c_l_by_d
 from .Neighboorhoods_gen import *
 from .CAW import CAW_F
 
@@ -29,6 +28,7 @@ def N1_intra(x:Solution, data:Sub_data, entry:list = [-2,-2,-2,[-2,-2]]):
     # print(e)
 
     xp = copy.deepcopy(x)
+
     #Dans le cadre de la collecte sale
     if e[0] == -1:
         t0 = xp.sales[e[2]]
@@ -60,6 +60,7 @@ def N1_inter(x:Solution, data:Sub_data, entry = [-2,-2,[-2,-2],[-2,-2]]):
     # print(e)
 
     xp = copy.deepcopy(x)
+
     if e[0] == -1:
 
         t0 = xp.sales[e[2][0]]
@@ -135,6 +136,7 @@ def N2_intra(x:Solution, data:Sub_data, entry = [-2,-2,-2,[-2,-2]]):
         e = copy.deepcopy(entry)
     # print(entry)     
     # print(e)
+
     xp = copy.deepcopy(x)
 
     if e[0] == -1:
@@ -230,6 +232,7 @@ def N3_intra(x:Solution, data:Sub_data, entry = [-2,-2,-2,[[-2,-2],-2]]):
     # print(e)
 
     xp = copy.deepcopy(x)
+
     if e[0] == -1:
         t0 = xp.sales[e[2]]
 
@@ -258,6 +261,7 @@ def N3_inter(x:Solution, data:Sub_data, entry = [-2,-2,[-2,-2],[[-2,-2],-2]]):
         e = copy.deepcopy(entry)
     # print(entry)     
     # print(e)
+
     xp = copy.deepcopy(x)
     
     if e[0] == -1:
@@ -341,6 +345,7 @@ def N4_intra(x:Solution, data:Sub_data, entry = [-2,-2,-2,[[-2,-2],-2]]):
     # print(e)
 
     xp = copy.deepcopy(x)
+
     if e[0] == -1:
         t0 = xp.sales[e[2]]
         t0.inverse_or_opt(e[3][0], e[3][1])
@@ -368,6 +373,7 @@ def N4_inter(x:Solution, data:Sub_data, entry = [-2,-2,[-2,-2],[[-2,-2],-2]]):
         e = copy.deepcopy(entry)
     # print(entry)     
     # print(e)
+
     xp = copy.deepcopy(x)
     
     if e[0] == -1:
@@ -443,7 +449,11 @@ def N5_Add(x:Solution, data:Sub_data, entry = [-2]):
         e = N5_add_rand(x,data.N,entry)
     else:
         e = copy.deepcopy(entry)
+    # print(entry)
+    # print(e)
+
     xp = copy.deepcopy(x)
+
     xp.plat.append(Plateforme(e[0]))
 
     return xp
@@ -458,11 +468,11 @@ def N5_Del(x:Solution, data:Sub_data, entry = [-2]):
         e = N5_del_rand(x,data.N,entry)
     else:
         e = copy.deepcopy(entry)
-    
     # print(entry)
     # print(e)
     
     xp = copy.deepcopy(x)
+
     # print("pré del")
 
     xp.plat.pop(e[0])
@@ -488,7 +498,11 @@ def N5_Swap(x:Solution, data:Sub_data, entry = [-2,-2]):
         e = N5_swap_rand(x,data.N,entry)
     else:
         e = copy.deepcopy(entry)
+    # print(entry)
+    # print(e)
+
     xp = copy.deepcopy(x)
+    
     xp.plat[e[0]].set_numero(e[1])
 
     return xp
@@ -504,7 +518,6 @@ def N6_one(x:Solution, data:Sub_data, entry = [-2,-2]):
         e = N6_one_rand(x,data.C,data.N,entry)
     else:
         e = copy.deepcopy(entry)
-
     # print(entry)
     # print(e)
 
@@ -539,7 +552,6 @@ def N6_one(x:Solution, data:Sub_data, entry = [-2,-2]):
 def N6_some(x:Solution, data:Sub_data, entry = [[-2],[-2]]):
     if entry[0] == [-2] or entry[1] == [-2]:
         e = N6_some_rand(x,data.C,data.N,entry)
-        print("gen")
     elif len(entry[0][0]) == len(entry[0][1]) :
         e = copy.deepcopy(entry)
     # print(entry)
@@ -551,7 +563,6 @@ def N6_some(x:Solution, data:Sub_data, entry = [[-2],[-2]]):
         found = False
         i = 0
         while not found and i < len(x.plat):
-            print(i)
             if e[0][s] in xp.plat[i].cli_affect:
                 found = True
             else:
@@ -578,6 +589,8 @@ def N6_all(x:Solution, data:Sub_data):
         p.tournees[0].clear()
         p.tournees[1].clear()
         
+    for c in range(data.N, data.C):
+        xp.plat[rd.choice(range(len(xp.plat)))].add_client(c)
     
     return xp
 

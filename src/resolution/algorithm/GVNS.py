@@ -56,43 +56,22 @@ def GVNS(path:str, data:Sub_data, x : Solution, lim_calc:int, lim_perturb:int,be
                     #xp.print_all_plateformes()
                     #Même si on ouvre/supprime/swap une plateforme, nous décidons au hasard de réaffecter les clients aux plateformes    
                     #S'il n'y a qu'une seule plateforme, la réaffectation n'est pas nécéssaire
-                    fonctions = [N6_one,N6_some,N6_all]
-                    prob = [1/5,3/5,1/5]
-                    rand = rd.random()
-                    j = 0
-                    sum_prob = prob[j]
-                    stop = False
-                    while not stop and j+1 < len(prob):
-                        sum_prob += prob[j+1]
-                        if sum_prob > rand:
-                            stop = True
-                        else:
-                            j+= 1
-                    xpp = fonctions[j](xp,data)
-                    benchmark["nb_plat"].append(len(xpp.plat))
-                    if k == 0:
-                        benchmark["k_VNS"].append((i,j))
+                    
+                    if len(xp.plat) > 1:
+                        xpp = N6_reaffect(xp, data)
                     else:
-                        benchmark["k_VNS"].append((-1,j))
+                        xpp = copy.deepcopy(xp)
 
                     #Sauvegarde pré VND
                     obj_pre = xpp.calc_func_obj(data.O,data.c)
                     benchmark["pre_z"].append(obj_pre)
 
-                    if len(xp.plat) > 1:
-                        xpp = N6_reaffect(xp, data)
-                    else:
-                        xpp = copy.deepcopy(xp)
                     #xpp.print_all_plateformes()
                     benchmark["nb_plat"].append(len(xpp.plat))
                     if k == 0:
                         benchmark["k_VNS"].append((i))
                     else:
                         benchmark["k_VNS"].append((-1))
-
-                    #Sauvegarde pré VND
-                    obj_pre = xpp.calc_func_obj(data.O,data.c)
-                    benchmark["pre_z"].append(obj_pre)
 
                     name = "VNS_"+str(nb_perturbations)+"_pre_loc_z"+str(sum(obj_pre))
                     temp = xpp.soluce_propre_to_map(data.locations, data.T-1)
@@ -110,6 +89,7 @@ def GVNS(path:str, data:Sub_data, x : Solution, lim_calc:int, lim_perturb:int,be
                     obj2 = xppp.calc_func_obj(data.O,data.c)
                     benchmark["z"].append(obj2)
 
+                    print(str(sum(obj1)) + " > "+str(sum(obj2)))
                     if sum(obj1) > sum(obj2):
                         print("xppp meilleur Solution dans voisinage de x")
                         x = xpp
@@ -143,18 +123,16 @@ def VND(path, data:Sub_data, x : Solution, lim_calc:int, nb_perturb:int, benchma
 
             k = 0
             entry = [p]
-            while k < k_max: # and count_calc < lim_calc:
-                # print("p =  " + str(p) + ", len(x.plat) = "+ str(len(x.plat)) + ", k = " +str(k) + ", k_max = "+str(k_max)+ ", count_calc = "+str(count_calc)+", lim_calc = "+str(lim_calc))#+", entry = "+str(entry))
-                print("p =  " + str(p) + ", k = " +str(k))
-                kp = k
+            while k < k_max and count_calc < lim_calc:
+                #print("p =  " + str(p) + ", len(x.plat) = "+ str(len(x.plat)) + ", k = " +str(k) + ", k_max = "+str(k_max)+ ", count_calc = "+str(count_calc)+", lim_calc = "+str(lim_calc))#+", entry = "+str(entry))
                 #print("___________________________________")
-                # print("Nb actuel de calcul effectues : "+str(count_calc))
+                #print("Nb actuel de calcul effectues : "+str(count_calc))
                 if count_calc < lim_calc:
                     #print("Voisinage exploré k : "+str(k))
                     founded = True
 
-                    while founded and count_calc < lim_calc and kp == k:
-                        # print("p =  " + str(p) + ", k = " +str(k)+ ", len(x.plat) = "+ str(len(x.plat)) + ", k_max = "+str(k_max)+", entry = "+str(entry))
+                    while founded and count_calc < lim_calc:
+                        #print("p =  " + str(p) + ", k = " +str(k)+ ", len(x.plat) = "+ str(len(x.plat)) + ", k_max = "+str(k_max)+", entry = "+str(entry))
                         # if k == 0:
                         # else:
                         #     print(k)
@@ -162,6 +140,7 @@ def VND(path, data:Sub_data, x : Solution, lim_calc:int, nb_perturb:int, benchma
                         temp = next_voisin(x, k, entry)
                         entry = temp[1]
                         # print(entry)
+                        count_calc += 1
 
                         #Si un voisin a été trouvé,on explore la solution
                         founded = temp[2]
@@ -175,7 +154,7 @@ def VND(path, data:Sub_data, x : Solution, lim_calc:int, nb_perturb:int, benchma
 
                             #print(str(x.calc_func_obj(data.O,data.c)) + " > " +str(obj_1))
                             if x.calc_func_obj(data.O,data.c) > obj_1:
-                                # print("---------------------xp meilleur Solution dans voisinage de x---------------------")
+                                #print("---------------------xp meilleur Solution dans voisinage de x---------------------")
                                 nb_modif += 1
                                 benchmark["modif_k"][-1].append([entry[0],entry[1], k])
                                 #Enregistrement solution
@@ -194,14 +173,10 @@ def VND(path, data:Sub_data, x : Solution, lim_calc:int, nb_perturb:int, benchma
                                 xp = x
                         # #Sinon on change de voisinage
                         else:
-                        #     p = entry[0]
                             entry = [p]
                             if k == 4:
                                 p += 1
-                            #print("NOT FOUNDED "+str(k))
 
-                        #     entry = [entry[0]]F
-                        count_calc += 1
 
                         # print("Nb actuel de calcul effectues : "+str(count_calc))
 
@@ -212,7 +187,7 @@ def VND(path, data:Sub_data, x : Solution, lim_calc:int, nb_perturb:int, benchma
                 k = k_max
                 
 
-        
+            p = p +1
             #x.print_all_plateformes()
             if k == k_max:
                 print("KMAX ATTEINT")

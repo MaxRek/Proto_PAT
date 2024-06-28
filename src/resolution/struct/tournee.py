@@ -52,7 +52,6 @@ class Tournee:
     #pop un sommet dans l'ordre
     def pop(self, i:int):
         self.size -= 1
-        print(i)
         s = self.order.pop(i)
         return s 
     
