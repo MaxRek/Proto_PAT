@@ -1,8 +1,9 @@
 from .plateforme import Plateforme
 from .tournee import Tournee
 from ..algorithm.CAW import CAW_F
-from ..tools import get_sum_qt_c_l_by_d
-import bisect
+from ..tools import get_sum_qt_c_l_by_d,reduct_LnfPT
+import random as rd
+from bisect import insort
 
 class Solution:
     sales:list[Tournee]
@@ -20,7 +21,7 @@ class Solution:
         for p in range(len(self.plat)):
             for c in self.plat[p].cli_affect:
                 if c not in ind_c:
-                    bisect.insort(ind_c, c)
+                    insort(ind_c, c)
                 else:
                     print("Erreur : client c"+str(c)+" affecté à au moins deux plateformes")
                     b = False
@@ -35,7 +36,7 @@ class Solution:
 
         #Pour chaque plateforme, vérification que les producteurs soient bien affectés + tournée de collecte propres
         for p in self.plat:
-            temp_LnfPT = p.reduct_LnfPT(C)
+            temp_LnfPT = reduct_LnfPT(p.Lfptn,C)
             temp_pt = p.verif_all_pt_visited()
             if temp_pt[0]: 
                 if sorted(p.pt_affect) == sorted(temp_LnfPT[0]) and sorted(temp_LnfPT[0]) == sorted(temp_pt[1]):
@@ -45,6 +46,7 @@ class Solution:
                             if sorted(p.cli_affect) == sorted(temp_c[1]):
                                 if (sum(temp_pt[2]) + p.xT*Q) != sum(temp_c[2]):
                                     print("Erreur : Somme des quantités livrés dans les tournées != somme quantités collectés")
+                                    print("xT = "+ str(p.xT))
                                     print(temp_c[2])
                                     print(temp_pt[2])
                                     print(sum(temp_c[2]))
@@ -79,6 +81,24 @@ class Solution:
                 b = False  
         return b
     
+    #Ajoute les visites manquantes de clients et de producteurs pour produits propres nécéssaires pour valider solution
+    #Se fait post affectation d'un client à une plateforme
+    def repair_solution_post_N6(self, data):
+        
+        unaffected_cli = list(range(data.N, data.C))
+        for p in self.plat:
+            for c in p.cli_affect:
+                if c in unaffected_cli:
+                    unaffected_cli.remove(c)
+
+
+        if unaffected_cli != []:
+            for c in unaffected_cli:
+                insort(self.plat[rd.choice(range(len(self.plat)))].cli_affect,c)
+
+        for p in self.plat:
+            p.repair(data)
+    
     def calc_func_obj(self,O:list, c:list):
         obj = 0
         sum_temp = [0,0]
@@ -96,7 +116,7 @@ class Solution:
 
     def init_CAW_cp(self, c:list, Q:float, C:int):
         for i in self.plat:
-            temp = i.reduct_LnfPT(C)
+            temp = reduct_LnfPT(i.Lfptn,C)
             i.tournees[0] = CAW_F(c, Q, i.numero, temp[0], temp[1])
 
     def init_CAW_lp(self, c:list, Q:float, d:dict, f:int):

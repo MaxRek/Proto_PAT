@@ -3,6 +3,12 @@ import random
 import bisect
 
 
+import numpy as np
+from os import urandom
+import random
+import bisect
+
+
 def sub_matrix(M : list, indexes : list):
     len_ind = len(indexes)
     new_M = np.zeros((len_ind,len_ind)).tolist()
@@ -13,7 +19,8 @@ def sub_matrix(M : list, indexes : list):
     return new_M
 
 def rand_ind_in_list(l:list):
-    return round(random.random()*(len(l)-1))
+    print(random.random())
+    return round(np.random.random()*(len(l)-1))
 
 #Suite de fonctions utilisés pour le calcul
 
@@ -48,6 +55,11 @@ def get_sum_qt_p_by_rev_d(rev_d:dict, p:int, f:int):
 #Récupère toutes les quantités demandés par un client c
 def get_sum_qt_c_by_d(d:dict, c:int, f:int):
     sum = np.zeros(f).tolist()
+    print(c)
+    print("---------------------")
+    print(d)
+    print("---------------------")
+    print(d[c])
     for key in d[c]:
         for values in d[c][key]:
             sum[values[0]] += values[1]
@@ -98,6 +110,16 @@ def calc_LnfPT_c(d:dict, c_l:list, C:int, pt:int,f:int):
         t = 1
     return (LnfPT, t)
 
+#Reduire LnfPT selon les producteurs à visiter, et les quantités propres associées
+def reduct_LnfPT(Lfptn:list, C:int):
+    indexes = []
+    qts = []
+    for i in range(len(Lfptn)):
+        sum_prod = sum(Lfptn[i])
+        if sum_prod > 0:
+            indexes.append(i+C)
+            qts.append(sum_prod)
+    return(indexes, qts)
             
 #Verifie qu'un point de récolte ne dépasse pas la capacité Q des véhicules
 def verif_LnfPT(LnfPT:list, Q:int):
@@ -196,4 +218,3 @@ def get_c_p_by_rev_d(rev_d:dict, p:int):
 #Recupère tous les clients affectés à une plateforme
 def get_wc_by_n(wc:list, n:int):
     return(list(i for i,j in enumerate(wc) if j == 1))
-

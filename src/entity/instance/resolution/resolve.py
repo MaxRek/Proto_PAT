@@ -8,7 +8,10 @@ from .benchmark import *
 
 import numpy as np
 
-def control(path:str,data: Sub_data, nb_calc : int = 20, nb_perturb:int = 100):
+def control(path:str,data: Sub_data, nb_calc : int = 10000, nb_perturb:int = 5):
+    print(path)
+    print(data)
+    
     s = init_solution(data)
 
     if "benchmark" not in os.listdir(path):
@@ -32,6 +35,7 @@ def control(path:str,data: Sub_data, nb_calc : int = 20, nb_perturb:int = 100):
     # aff = Aff()
     GVNS(path_bench,data, s, nb_calc, nb_perturb,benchmark)
     path_stats = path_bench+"/stats"
+    os.mkdir(path_stats)
     names = [path_stats+"/pre_post",path_stats+"/pre",path_stats+"/post", path_stats+"/graph"]
 
     with open(path_stats+"/benchmark.txt",'w') as f:
