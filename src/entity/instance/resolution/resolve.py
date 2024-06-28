@@ -9,7 +9,7 @@ import datetime
 
 import numpy as np
 
-def control(path:str,data: Sub_data, nb_calc : int = 20000, nb_perturb:int = 100):
+def control(path:str,data: Sub_data, nb_calc : int = 20, nb_perturb:int = 100):
     s = init_solution(data)
 
     if "benchmark" not in os.listdir(path):
@@ -28,18 +28,15 @@ def control(path:str,data: Sub_data, nb_calc : int = 20000, nb_perturb:int = 100
         "modif_k": [],
         "non_fini": []
     }
-    os.mkdir(path_bench)
+
     
     # aff = Aff()
     GVNS(path_bench,data, s, nb_calc, nb_perturb,benchmark)
-    print(benchmark)
     path_stats = path_bench+"/stats"
     names = [path_stats+"/pre_post",path_stats+"/pre",path_stats+"/post", path_stats+"/graph"]
 
-    os.mkdir(path_stats)
     with open(path_stats+"/benchmark.txt",'w') as f:
         f.write(str(benchmark))
 
     plot_time(benchmark["time"],benchmark["non_fini"], path_stats+"/time")
     all_bar_obj(benchmark["z"],benchmark["pre_z"],benchmark["non_fini"],names)
-    print(benchmark)

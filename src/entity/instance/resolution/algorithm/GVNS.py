@@ -3,6 +3,7 @@ from..struct.sub_data import Sub_data
 from....aff import Aff
 from..algorithm.Neighboorhoods import *
 from..algorithm.Neighboorhoods_next import *
+import datetime
 
 def GVNS(path:str, data:Sub_data, x : Solution, lim_calc:int, lim_perturb:int,benchmark:dict):
 
@@ -101,16 +102,6 @@ def GVNS(path:str, data:Sub_data, x : Solution, lim_calc:int, lim_perturb:int,be
 
                     time_start = datetime.datetime.now()
                     xppp = VND(path, data, xpp, lim_calc, nb_perturbations, benchmark)
-                    time_stop = datetime.datetime.now()-time_start
-                    print(time_stop)
-                    benchmark["time"].append(time_stop.seconds)
-                    time_start = datetime.datetime.now()
-                    xppp = VND(path, data, xpp, lim_calc, nb_perturbations, benchmark)
-                    time_stop = datetime.datetime.now()-time_start
-                    print(time_stop)
-                    benchmark["time"].append(time_stop.seconds)
-                    time_start = datetime.datetime.now()
-                    xppp = VND(path, data, xpp, lim_calc, nb_perturbations, benchmark)
                     benchmark["time"].append((datetime.datetime.now()-time_start).seconds)
                     if x.calc_func_obj(data.O,data.c) > xppp.calc_func_obj(data.O,data.c):
                         print("xpp meilleur Solution dans voisinage de x")
@@ -129,14 +120,14 @@ def GVNS(path:str, data:Sub_data, x : Solution, lim_calc:int, lim_perturb:int,be
             
     return x
 
-def VND(path, data:Sub_data, x : Solution, lim_calc:int, nb_perturb:int):
+def VND(path, data:Sub_data, x : Solution, lim_calc:int, nb_perturb:int, benchmark:dict):
     k_max = 4
     fonctions = [[N1_intra,N1_inter],[N2_intra,N2_inter],[N3_intra,N3_inter],[N4_intra,N4_inter]]
     print("___________________________________")
     print("Début algo VND")
     count_calc = 0
     aff = Aff()
-    
+    nb_modif = 0
     while count_calc < lim_calc:
         k = 0
         entry = [-1]
@@ -180,7 +171,7 @@ def VND(path, data:Sub_data, x : Solution, lim_calc:int, nb_perturb:int):
                             temp = x.soluce_sales_to_map(data.locations, data.T-1)
                             aff.save_soluce(path+"/"+name+"_s",temp[0],roads = temp[1])
                             aff.clean_M()
-
+                            nb_modif += 1
                             x = xp
                             k = 0
                         #Si la modification a eu lieu dans les circuits propre d'une plateforme, nous modifions l'entrée pour recommencer l'exploration sur N1 de cette plateforme

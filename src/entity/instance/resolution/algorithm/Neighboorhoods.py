@@ -600,3 +600,5 @@ def N6_reaffect(x:Solution, data:Sub_data):
     # xp.init_CAW_cp(data.C, data.Q, data.C)
     # xp.init_CAW_lp(data.c, data.Q, data.d, data.F)
     xp.repair_solution_post_N6(data)
+
+    return xp
