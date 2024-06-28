@@ -4,7 +4,6 @@ from..struct.plateforme import Plateforme
 from..struct.tournee import Tournee
 import copy
 # from numpy import random as rd
-import time
 from ..tools import rand_ind_in_list, reduct_LnfPT, calc_LnfPT_c, get_fs_prod_ind_qt, get_sum_qt_c_l_by_d
 from .Neighboorhoods_gen import *
 

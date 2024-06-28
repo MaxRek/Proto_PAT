@@ -1,11 +1,10 @@
 from ...aff import Aff
 from .struct.sub_data import Sub_data
 from .init_solution import init_solution
+import datetime
+import os
 from .algorithm.GVNS import GVNS
 from .benchmark import *
-import os
-import datetime
-
 
 import numpy as np
 

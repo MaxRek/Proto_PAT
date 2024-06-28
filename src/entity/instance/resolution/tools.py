@@ -1,5 +1,4 @@
 import numpy as np
-from os import urandom
 import random
 import bisect
 
@@ -14,8 +13,7 @@ def sub_matrix(M : list, indexes : list):
     return new_M
 
 def rand_ind_in_list(l:list):
-    print(random.random())
-    return round(np.random.random()*(len(l)-1))
+    return round(random.random()*(len(l)-1))
 
 #Suite de fonctions utilisés pour le calcul
 
@@ -100,16 +98,6 @@ def calc_LnfPT_c(d:dict, c_l:list, C:int, pt:int,f:int):
         t = 1
     return (LnfPT, t)
 
-#Reduire LnfPT selon les producteurs à visiter, et les quantités propres associées
-def reduct_LnfPT(Lfptn:list, C:int):
-    indexes = []
-    qts = []
-    for i in range(len(Lfptn)):
-        sum_prod = sum(Lfptn[i])
-        if sum_prod > 0:
-            indexes.append(i+C)
-            qts.append(sum_prod)
-    return(indexes, qts)
             
 #Verifie qu'un point de récolte ne dépasse pas la capacité Q des véhicules
 def verif_LnfPT(LnfPT:list, Q:int):
