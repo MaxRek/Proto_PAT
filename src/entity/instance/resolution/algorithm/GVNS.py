@@ -59,7 +59,6 @@ def GVNS(path:str, data:Sub_data, x : Solution, lim_calc:int, lim_perturb:int,be
                     fonctions = [N6_one,N6_some,N6_all]
                     prob = [1/5,3/5,1/5]
                     rand = rd.random()
-
                     j = 0
                     sum_prob = prob[j]
                     stop = False
@@ -85,12 +84,13 @@ def GVNS(path:str, data:Sub_data, x : Solution, lim_calc:int, lim_perturb:int,be
                         xpp = N6_reaffect(xp, data)
                     else:
                         xpp = copy.deepcopy(xp)
+                    xpp.print_all_plateformes()
                     benchmark["nb_plat"].append(len(xpp.plat))
                     if k == 0:
                         benchmark["k_VNS"].append((i))
                     else:
                         benchmark["k_VNS"].append((-1))
-                        
+
                     #Sauvegarde post VND
                     name = "VNS_"+str(nb_perturbations)+"_pre_loc_z"+str(xpp.calc_func_obj(data.O,data.c))
                     temp = xpp.soluce_propre_to_map(data.locations, data.T-1)
@@ -103,7 +103,9 @@ def GVNS(path:str, data:Sub_data, x : Solution, lim_calc:int, lim_perturb:int,be
                     time_start = datetime.datetime.now()
                     xppp = VND(path, data, xpp, lim_calc, nb_perturbations, benchmark)
                     benchmark["time"].append((datetime.datetime.now()-time_start).seconds)
-                    if x.calc_func_obj(data.O,data.c) > xppp.calc_func_obj(data.O,data.c):
+
+                    # xppp.print_all_plateformes()
+                    if sum(x.calc_func_obj(data.O,data.c)) > sum(xppp.calc_func_obj(data.O,data.c)):
                         print("xpp meilleur Solution dans voisinage de x")
                         x = xpp
                         k = 0
@@ -206,4 +208,5 @@ def VND(path, data:Sub_data, x : Solution, lim_calc:int, nb_perturb:int, benchma
         benchmark["nb_modifs"].append(nb_modif)
         count_calc = lim_calc
         #A la fin des explorations pour une plateforme, on passe à la suivante
+
     return x
