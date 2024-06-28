@@ -5,7 +5,7 @@ from..algorithm.Neighboorhoods import *
 from..algorithm.Neighboorhoods_next import *
 import datetime
 
-
+#modif pour commit
 def GVNS(path:str, data:Sub_data, x : Solution, lim_calc:int, lim_perturb:int,benchmark:dict):
     if x.verif_solution(data.C,data.N,data.Q):
         aff = Aff()
