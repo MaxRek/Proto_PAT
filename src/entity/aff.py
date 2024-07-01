@@ -93,8 +93,12 @@ class Aff:
 
         for road in roads:
             road_loc = []
+            color = ["red", "blue"]
+            i = 0
             for sommet in road:
+                #print(sommets_to_add[sommet])
                 road_loc.append(sommets_to_add[sommet][1])
-            folium.PolyLine(road_loc, color = "black", weight=2.5, opacity=0.6).add_to(self.M)
-
+                if sommets_to_add[sommet][0] == "C":
+                    i = 1
+            folium.PolyLine(road_loc, color = color[i], weight=2.5, opacity=0.6).add_to(self.M)
         self.M.save(path+".html")

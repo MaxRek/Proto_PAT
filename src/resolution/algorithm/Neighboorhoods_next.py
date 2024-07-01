@@ -109,7 +109,7 @@ def N1_plat(x:Solution, p:int, entry:list):
     #Exploration des plateformes, INTRA
     while not next_found and e[0] == p:
         if type(e[2]) == int:
-            if e[0] < len(x.plat):
+            if e[0] == p:
                 #itération sur les Tournées de collecte ou de livraison
                 if e[1] < 2:
                     #print(len(x.plat[e[0]].tournees[e[1]]))

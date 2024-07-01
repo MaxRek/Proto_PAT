@@ -218,7 +218,7 @@ def N2_inter(x:Solution, data:Sub_data, entry = [-2,-2,[-2,-2],[-2,-2]]):
 #EXTENDED OR_OPT intra_tournee
 #entry = paramètre permettant de séléctionner 
 # [
-#   index_plat : -2 pour tournées sale, 0 à nb plateforme
+#   index_plat : -1 pour tournées sale, 0 à nb plateforme
 #   index_type_tournee : 0 pour sales, 1 pour propre
 #   index_tournee : 0 à nb de tournee de tel type
 #   indexes_affect : ([index_debut seq, index_fin seq], index où inserer seq)
@@ -249,7 +249,7 @@ def N3_intra(x:Solution, data:Sub_data, entry = [-2,-2,-2,[[-2,-2],-2]]):
 #EXTENDED OR_OPT inter_tournee
 #entry = paramètre permettant de séléctionner 
 # [
-#   index_plat : -2 pour tournées sale, 0 à nb plateforme
+#   index_plat : -1 pour tournées sale, 0 à nb plateforme
 #   index_type_tournee : 0 pour sales, 1 pour propre
 #   index_tournee : (0 à nb de tournee de tel type, 0 à nb de tournee de tel type)
 #   indexes_affect : ([index_debut seq, index_fin seq], index où inserer seq dans t2)

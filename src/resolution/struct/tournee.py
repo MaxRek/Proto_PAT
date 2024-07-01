@@ -87,7 +87,6 @@ class Tournee:
 
     #Mouvement de EXTENDED OR_OPT N3_inter
     def insert_seq_or_opt(self, seq:list, i:int):
-        print(seq)
         for j in range(len(seq)):
             self.order.insert(i,seq[-1*(j+1)])
             self.size += 1
