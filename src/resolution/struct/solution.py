@@ -27,7 +27,8 @@ class Solution:
                     b = False
         
         if ind_c== list(range(N,C)):
-            print("ok")
+            a = 0
+            # print("ok")
         else:
             print("Tous les clients ne sont pas affectés : ")
             print(ind_c)

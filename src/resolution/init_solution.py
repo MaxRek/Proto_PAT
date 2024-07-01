@@ -5,6 +5,7 @@ from .tools import *
 from .algorithm.CAW import CAW_F
 import math
 import numpy as np
+from random import choice
 
 def init_solution(data : Sub_data):
     
@@ -15,7 +16,7 @@ def init_solution(data : Sub_data):
     # print(data.P)
     # print(data.T)
 
-    s.plat.append(Plateforme(rand_ind_in_list(list(range(data.N)))))
+    s.plat.append(Plateforme(choice(list(range(data.N)))))
     s.add_client_to_plat(0,range(data.N,data.C),data.d)
     s.plat[0].calc_LnfPT_c(data.d, data.C, data.F, data.T,data.T, data.Q)
 
@@ -35,7 +36,7 @@ def init_solution(data : Sub_data):
     #print(get_sum_qt_c_l_by_d(data.d, s.plat[0].cli_affect,data.F))
     s.init_CAW_lp(data.c, data.Q, data.d, data.F)
 
-    s.plat[0].print_plateforme()
+    #s.plat[0].print_plateforme()
     s.verif_solution(data.C,data.N,data.Q)
     #print(s.calc_func_obj(data.O,data.c))
 

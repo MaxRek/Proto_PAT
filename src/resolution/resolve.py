@@ -35,8 +35,10 @@ def control(path:str,name:str,data: Sub_data, nb_calc : int = 40000, nb_perturb:
 
     
     # Debut algorithme
-    GVNS(path_bench,data, s, nb_calc, nb_perturb,benchmark)
-    
+    sp = GVNS(path_bench,data, s, nb_calc, nb_perturb,benchmark)
+    print(sp.calc_func_obj(data.O,data.c))
+
+
     #Ecriture des résultats + graphe
     with open(path_stats+"/benchmark.txt",'w') as f:
         f.write(str(benchmark))

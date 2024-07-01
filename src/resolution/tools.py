@@ -18,10 +18,6 @@ def sub_matrix(M : list, indexes : list):
 
     return new_M
 
-def rand_ind_in_list(l:list):
-    print(random.random())
-    return round(np.random.random()*(len(l)-1))
-
 #Suite de fonctions utilisés pour le calcul
 
 #qt = quantités

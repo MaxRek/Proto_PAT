@@ -29,17 +29,17 @@ def GVNS(path:str, data:Sub_data, x : Solution, lim_calc:int, lim_perturb:int,be
 
         #Boucle effectuant tous les itérations
         while nb_perturbations < lim_perturb:
-            print("______________________________________________")
-            print("Nb actuel de perturbations effectues : "+str(nb_perturbations))
-            k = 0
             
+            k = 0
+            k_s = 0
+
             #Boucles effectuant les itérations et variant les k
             while k < k_max and nb_perturbations < lim_perturb:
+                print("______________________________________________")
+                print("Nb actuel de perturbations effectues : "+str(nb_perturbations))
                 print("Voisinage exploré k : "+str(k))
-                
-                #Selon k
-                
-                #Si on modifie une plateforme
+                                
+                #Pour le propre, si on modifie une plateforme
                 if k == 0:
                     #On définit les fonctions qu'on peut utiliser : On en peut pas fermer la dernière plateforme ouverte
                     fonctions = [N5_Add,N5_Swap]
@@ -59,14 +59,24 @@ def GVNS(path:str, data:Sub_data, x : Solution, lim_calc:int, lim_perturb:int,be
                             i+= 1
                     
                     xp = fonctions[i](x,data)
-                
                 #Sinon on copie juste la solution
                 else:
                     xp = copy.deepcopy(x)
                 
-                # #Affichage de la modification
-                #xp.print_all_plateformes()
                 
+                #Pour le sale, on perturbe une ou des tournées, vérification qu'il y a bien plusieurs tournées pour appliquer tous les voisinages :
+                for i in range(5):
+                    if len(xp.sales) > 1:
+                        fonctions_s = [[N1_intra,N1_inter],[N2_intra,N2_inter],[N3_intra,N3_inter],[N4_intra,N4_inter]]
+                        ks = rd.choice(range(len(xp.sales)))
+                        ks_t = rd.randint(0,1)
+                    else:
+                        fonctions_s = [[N1_intra],[N2_intra],[N3_intra],[N4_intra]]
+                        ks = rd.choice(range(len(xp.sales)))
+                        ks_t = 0
+                        
+                    e = GVNS_s_e(ks,ks_t)
+                    xp.sales = fonctions_s[ks][ks_t](xp,data,e).sales
 
                 #Si il y a plus d'une plateforme si on ouvre/supprime/swap une plateforme, nous affecter les clients à la plateforme la plus proche
                 #S'il n'y a qu'une seule plateforme, la réaffectation n'est pas nécéssaire
@@ -86,7 +96,7 @@ def GVNS(path:str, data:Sub_data, x : Solution, lim_calc:int, lim_perturb:int,be
                     benchmark["k_VNS"].append((-1))
 
                 #Sauvegarde pré VND 
-                name = "VNS_"+str(nb_perturbations)+"_pre_loc_z"+str(sum(obj_pre))
+                name = "VNS_"+str(nb_perturbations)+"_pre_loc_z"+str(obj_pre)
                 temp = xpp.soluce_propre_to_map(data.locations, data.T-1)
                 aff.save_soluce(path+"/"+name+"_p",temp[0],roads = temp[1])
                 aff.clean_M()
@@ -98,19 +108,26 @@ def GVNS(path:str, data:Sub_data, x : Solution, lim_calc:int, lim_perturb:int,be
                 time_start = datetime.datetime.now()
                 xppp = VND(path, data, xpp, lim_calc, nb_perturbations, benchmark)
                 benchmark["time"].append((datetime.datetime.now()-time_start).seconds)
+                print("- - - - - - - - - - - - - - - - - - - - -")
 
                 #Valeurs objectifs de solution initiale + solution perturbée améliorée
                 obj1 = x.calc_func_obj(data.O,data.c)
                 obj2 = xppp.calc_func_obj(data.O,data.c)
                 benchmark["z"].append(obj2)
-
+                print(str(obj1) + " > " +str(obj2))
                 print(str(sum(obj1)) + " > "+str(sum(obj2)))
                 
-                #La solution améliorée est-elle meilleure que celle enregistrée ?
-                if sum(obj1) > sum(obj2):
+                #La solution sale améliorée est-elle meilleure que celle enregistrée ?
+                if obj1[0] > obj2[0]:
                     #La solution est meilleure, enregistrement et modification de k
-                    print("xppp meilleur Solution dans voisinage de x")
-                    x = xppp
+                    print("xppp sales meilleur Solution dans voisinage de x")
+                    x.sales = xppp.sales
+
+                #La solution propre améliorée est-elle meilleure que celle enregistrée ?
+                if sum(obj1[1:2]) > sum(obj2[1:2]):
+                    #La solution est meilleure, enregistrement et modification de k
+                    print("xppp propre meilleur Solution dans voisinage de x")
+                    x.plat = xppp.plat
                     k = 0
                 else:
                     #La solution n'est pas meilleure, nous recommençons avec valeur de k supérieur
@@ -121,7 +138,18 @@ def GVNS(path:str, data:Sub_data, x : Solution, lim_calc:int, lim_perturb:int,be
 
         print("Nb de perturbations max atteint, fin d'algo")
         print("[][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][]")
-
+        
+        
+        #Sauvegarde post recherche
+        obj_best = x.calc_func_obj(data.O,data.c)
+        print("Meilleur solution = "+str(obj_best))
+        name = "Best_soluce_"+str(obj_best)
+        temp = x.soluce_propre_to_map(data.locations, data.T-1)
+        aff.save_soluce(path+"/"+name+"_p",temp[0],roads = temp[1])
+        aff.clean_M()
+        temp = x.soluce_sales_to_map(data.locations, data.T-1)
+        aff.save_soluce(path+"/"+name+"_s",temp[0],roads = temp[1])
+        aff.clean_M()
             
     return x
 
@@ -147,17 +175,14 @@ def VND(path, data:Sub_data, x : Solution, lim_calc:int, nb_perturb:int, benchma
     p = -1
     k = 0
 
+    #Benchmark : modification effectué à retenir
+    benchmark["modif_k"].append([])
+
     #Début itération par plateforme, nous traitons chaque plateforme l'une apres l'autre
     #Puisque k 
     while p < len(x.plat) and count_calc < lim_calc:
-        
-        #Pour la plateforme, nombre de modifs effectués à retenir
-        benchmark["modif_k"].append([])
-
         #Init k, et entrée pour générateur
         entry = [p]
-
-
         # # Affichage : <plateforme> <nb_plat>, <k> <nb_k>, <it_calc> <# de calculs maximum>
         #print("p =  " + str(p) + ", len(x.plat) = "+ str(len(x.plat)) + ", k = " +str(k) + ", k_max = "+str(k_max)+ ", count_calc = "+str(count_calc)+", lim_calc = "+str(lim_calc))#+", entry = "+str(entry))
         if count_calc < lim_calc:
@@ -185,19 +210,19 @@ def VND(path, data:Sub_data, x : Solution, lim_calc:int, nb_perturb:int, benchma
                     #Calcul de la fonc obj et si le voisin a une meilleure fonction objectif, remplacement par celui çi
                     obj_1 = xp.calc_func_obj(data.O,data.c)
                     if x.calc_func_obj(data.O,data.c) > obj_1:
-                        print("MODIFICATION SOLUTION")
+                        #print("MODIFICATION SOLUTION K = "+str(k))
                         #Benchmark, nb de modif pour la recherche locale incrémenté + modif individuelle enregistrée 
                         nb_modif += 1
                         benchmark["modif_k"][-1].append([entry[0],entry[1], k])
 
-                        #Enregistrement solution en carte
-                        name = "VNS_"+str(nb_perturb)+"_VND_"+str(count_calc)+"_z"+str(obj_1)
-                        temp = xp.soluce_propre_to_map(data.locations, data.T-1)
-                        aff.save_soluce(path+"/"+name+"_p",temp[0],roads = temp[1])
-                        aff.clean_M()
-                        temp = xp.soluce_sales_to_map(data.locations, data.T-1)
-                        aff.save_soluce(path+"/"+name+"_s",temp[0],roads = temp[1])
-                        aff.clean_M()
+                        # #Enregistrement solution en carte
+                        # name = "VNS_"+str(nb_perturb)+"_VND_"+str(count_calc)+"_z"+str(obj_1)
+                        # temp = xp.soluce_propre_to_map(data.locations, data.T-1)
+                        # aff.save_soluce(path+"/"+name+"_p",temp[0],roads = temp[1])
+                        # aff.clean_M()
+                        # temp = xp.soluce_sales_to_map(data.locations, data.T-1)
+                        # aff.save_soluce(path+"/"+name+"_s",temp[0],roads = temp[1])
+                        # aff.clean_M()
 
                         #La solution retenue devient la nouvelle solution de base (première descente), reinitialisation de k
                         x = xp
@@ -226,7 +251,7 @@ def VND(path, data:Sub_data, x : Solution, lim_calc:int, nb_perturb:int, benchma
                 #Incrémentation nombre de calcul
                 count_calc += 1
 
-            print("ARRIVEE NOUVEAU VOISINAGE")
+            #print("ARRIVEE NOUVEAU VOISINAGE")
 
     # Benchmark : Algorithme ayant atteint la fin de son exploration 
     if count_calc < lim_calc:
@@ -239,5 +264,26 @@ def VND(path, data:Sub_data, x : Solution, lim_calc:int, nb_perturb:int, benchma
     
     # Benchmark : Nb de modification effectué lors de cette recherche locale
     benchmark["nb_modifs"].append(nb_modif)
+
+    name = "VNS_"+str(nb_perturb)+"_VND_"+str(count_calc)+"_z"+str(obj_1)
+    temp = x.soluce_propre_to_map(data.locations, data.T-1)
+    aff.save_soluce(path+"/"+name+"_p",temp[0],roads = temp[1])
+    aff.clean_M()
+    temp = x.soluce_sales_to_map(data.locations, data.T-1)
+    aff.save_soluce(path+"/"+name+"_s",temp[0],roads = temp[1])
+    aff.clean_M()
     
     return x
+
+def GVNS_s_e(k:int, k_t:int):
+    if k == 0 or k == 1:
+        if k_t == 0:
+            e = [-1,0,-2,[-2,-2]]
+        else:
+            e = [-1,0,[-2,-2],[-2,-2]]
+    elif k == 2 or k == 3:
+        if k_t == 0:
+            e = [-1,0,-2,[[-2,-2],-2]]
+        else:
+            e = [-1,0,[-2,-2],[[-2,-2],-2]]
+    return e
