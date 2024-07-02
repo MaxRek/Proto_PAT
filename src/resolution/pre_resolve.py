@@ -73,10 +73,9 @@ def reduction(inst:Instance):
     
 
     sdata = Sub_data(inst.data.N,len(indexes_loc[0]),len(indexes_loc[1]),inst.data.F,sub_tsp, inst.data.Q, inst.data.O, sub_D, new_d, sub_c, indexes_loc, inst.data.df)
-    sdec = Dec(len(indexes_loc[0]),inst.data.N,len(indexes_loc[1]), 1, inst.data.F, inst.data.K)
 
     # for i in i.data.d.keys():
     #     if 
     #     for j in i:
 
-    return sdata, sdec
+    return sdata

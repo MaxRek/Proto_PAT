@@ -38,8 +38,7 @@ instance.data.Q = 1200
 #print(instance.data.d)
 instance.save_instance()
 
-red = reduction(instance)
-control(PATH_OUT,instance.name,red[0])
+control(PATH_OUT,instance)
 
 #print(len(instance.data.c))
 # instance.data.gen_c()

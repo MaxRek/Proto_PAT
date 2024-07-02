@@ -1,21 +1,27 @@
 from .struct.sub_data import Sub_data
+from ..entity.instance import instance
 from .init_solution import init_solution
 import datetime
 import os
 from .algorithm.GVNS import GVNS
 from .benchmark import *
+from src.resolution.pre_resolve import reduction
 
 
-def control(path:str,name:str,data: Sub_data, nb_calc : int = 40000, nb_perturb:int = 5):
 
+def control(path:str,inst:instance, nb_calc : int = 200000, nb_perturb:int = 30):
+
+    #Reduction du problème aux sommets concernées
+    sub_data = reduction(inst)
+    
     #Construction solution initiale
-    s = init_solution(data)
+    s = init_solution(sub_data)
 
     #Dossier pour benchmark, pour l'instance puis pour le test
-    if name not in os.listdir(path):
-        os.mkdir(path+"/"+name)
+    if inst.name not in os.listdir(path):
+        os.mkdir(path+"/"+inst.name)
     now = datetime.datetime.now()
-    path_bench = path+"/"+name+"/"+str(now.month)+"_"+str(now.day)+" "+str(now.hour)+"-"+str(now.minute)
+    path_bench = path+"/"+inst.name+"/"+str(now.month)+"_"+str(now.day)+" "+str(now.hour)+"-"+str(now.minute)
     os.mkdir(path_bench)
     path_stats = path_bench+"/stats"
     os.mkdir(path_stats)
@@ -35,8 +41,8 @@ def control(path:str,name:str,data: Sub_data, nb_calc : int = 40000, nb_perturb:
 
     
     # Debut algorithme
-    sp = GVNS(path_bench,data, s, nb_calc, nb_perturb,benchmark)
-    print(sp.calc_func_obj(data.O,data.c))
+    sp = GVNS(path_bench, sub_data, s, nb_calc, nb_perturb,benchmark)
+    print(sp.calc_func_obj(sub_data.O,sub_data.c))
 
 
     #Ecriture des résultats + graphe
