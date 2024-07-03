@@ -1,5 +1,4 @@
 from ..entity.instance.instance import Instance
-from ..entity.instance.decision import Dec
 from .struct.sub_data import Sub_data
 from.tools import sub_matrix
 
@@ -78,4 +77,5 @@ def reduction(inst:Instance):
     #     if 
     #     for j in i:
 
-    return sdata
+
+    return [sdata,indexes_loc]

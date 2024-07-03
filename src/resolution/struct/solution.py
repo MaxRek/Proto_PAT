@@ -190,3 +190,26 @@ class Solution:
             sommets[T_ind] = ("T",sommets[T_ind][1])
         
         return (sommets, roads)
+    
+    def soluce_to_dict(self):
+        dict_soluce = {}
+        tournees_sales = []
+        for t in self.sales:
+            tournees_sales.append(t.tournee_to_dict())
+        dict_soluce["sales"] = tournees_sales
+        dict_soluce["plateformes"] = []
+        for p in self.plat:
+            dict_soluce["plateformes"].append(p.plateforme_to_dict())
+        return dict_soluce
+    
+    def dict_to_solution(self,d_s : dict):
+        self.sales = []
+        for d_t in d_s["sales"]:
+            t = Tournee(0)
+            t.dict_to_tournee(d_t)
+            self.sales.append(t)
+        for d_p in d_s["plateformes"]:
+            p = Plateforme(-1)
+            p.dict_to_plateforme(d_p)
+            self.plat.append(p)
+

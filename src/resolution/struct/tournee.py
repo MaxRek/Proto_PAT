@@ -129,6 +129,21 @@ class Tournee:
         # print("_______")
         # print(obj)
         # print("_______")s
-
-
         return obj
+    
+    def tournee_to_dict(self):
+        tournee_dict = {}
+        tournee_dict["origin"] = self.origin
+        tournee_dict["order"] = self.order
+        tournee_dict["size"] = self.size
+        tournee_dict["load"] = self.load
+        return tournee_dict
+    
+    def dict_to_tournee(self, d_t:dict):
+        self.origin = d_t["origin"]
+        self.order = d_t["order"]
+        self.size =  d_t["size"]
+        self.load = d_t["load"] 
+    
+
+        

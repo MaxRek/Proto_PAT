@@ -21,6 +21,12 @@ class Plateforme:
         self.tournees = [[],[]]
         self.xT = 0
 
+    def set_plat_by_dict(self, d_p :dict):
+        self.numero = d_p["numero"]
+        self.cli_affect = d_p["cli_affect"]
+        self.pt_affect = d_p["pt_affect"]
+        self.tournees = d_p["tournees"]
+
     def set_numero(self,n:int):
         self.numero = n
         for t in self.tournees[0]:
@@ -263,3 +269,28 @@ class Plateforme:
         for i in self.tournees[1]:
             i.print_tournee()
         print("xT = "+str(self.xT))
+
+    def plateforme_to_dict(self):
+        dict_plat = {}
+        dict_plat["numero"] = self.numero
+        dict_plat["xT"] = self.xT       
+        dict_plat["cli_affect"] = self.cli_affect
+        dict_plat["pt_affect"] = self.pt_affect
+        dict_plat["tournees"] = []
+        for i in range(2):
+            tournees = []
+            for t in self.tournees[i]: 
+                tournees.append(t.tournee_to_dict())
+            dict_plat["tournees"].append(tournees)
+        return dict_plat
+
+    def dict_to_plateforme(self, d_p:dict):
+        self.numero = d_p["numero"]
+        self.xT = d_p["xT"]
+        self.cli_affect = d_p["cli_affect"]
+        self.pt_affect = d_p["pt_affect"]
+        for i in range(2):
+            for d_t in d_p["tournees"][i]: 
+                t = Tournee(0)
+                t.dict_to_tournee(d_t)
+                self.tournees[i].append(t)

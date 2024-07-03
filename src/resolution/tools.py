@@ -1,12 +1,5 @@
 import numpy as np
-import random
-import bisect
-
-
-import numpy as np
-from os import urandom
-import random
-import bisect
+from src.entity.instance import *
 
 
 def sub_matrix(M : list, indexes : list):
@@ -209,3 +202,88 @@ def get_c_p_by_rev_d(rev_d:dict, p:int):
 #Recupère tous les clients affectés à une plateforme
 def get_wc_by_n(wc:list, n:int):
     return(list(i for i,j in enumerate(wc) if j == 1))
+
+#Modifier un dict décrivant une solution en indices lors de résolution en solution avec indices post resolution
+def updating_solution_to_instance(d_s : dict, indexes_resolution:list, data):
+
+    for d_t in d_s["sales"]:
+        d_t = updating_tournee(d_t, data.C, indexes_resolution[1],data.T-1)
+
+    for d_p in d_s["plateformes"]:
+        d_p = updating_plateforme(d_p, indexes_resolution, data.C,data.P,data.T-1)
+    return d_s
+
+def updating_tournee(d_t : dict, base:int, indices:list, T:int):
+    for sommet in range(len(d_t["order"])): 
+        if(d_t["order"][sommet]==T):
+            d_t["order"][sommet] = "T"
+        else:
+            d_t["order"][sommet] = indices[d_t["order"][sommet]-base]
+    return d_t
+
+def updating_plateforme(d_p : dict, indices:list, base_c :int, base_pt : int, T:int):
+    for c in range(len(d_p["cli_affect"])):
+        d_p["cli_affect"][c] = indices[0][d_p["cli_affect"][c]-base_c]
+    for p in range(len(d_p["pt_affect"])):
+        if d_p["pt_affect"][p] == T:
+            d_p["pt_affect"][p] = "T"
+        else:
+            d_p["pt_affect"][p] = indices[1][d_p["pt_affect"][p]-base_pt]
+    for d_t in d_p["tournees"][0]:
+        d_t = updating_tournee(d_t, base_pt, indices[1],T)
+    for d_t in d_p["tournees"][1]:
+        d_t = updating_tournee(d_t, base_c, indices[0],T)
+        
+def translate_solution(d_s:dict, df):
+    for d_t in d_s["sales"]:
+        d_t = translate_tournee(d_t, df.F, df.T)
+    for d_p in d_s["plateformes"]:
+        d_p = translate_plateforme(d_p, df.N, df.E, df.F, df.T)
+    return d_s
+
+def translate_tournee(d_t : dict, df_type,T):
+    if "Nom de la structure" in df_type.columns:
+        name = "Nom de la structure"
+    else:
+        name = "Nom"
+    for sommet in range(len(d_t["order"])): 
+        if(d_t["order"][sommet]=="T"):
+            d_t["order"][sommet] = T.iloc[0]["Nom de la structure"]
+        else:
+            d_t["order"][sommet] = df_type.iloc[d_t["order"][sommet]][name]
+    return d_t
+
+def translate_plateforme(d_p : dict, df_N, df_E, df_F, df_T):
+    d_p["numero"] = df_N.loc[d_p["numero"]]["Nom de la structure"]
+    for d_t in d_p["tournees"][0]:
+        d_t = translate_tournee(d_t, df_F, df_T)
+    for d_t in d_p["tournees"][1]:
+        d_t = translate_tournee(d_t, df_E, df_T)
+    return d_p
+
+def dict_solution_to_txt(d_s:dict):
+    str_s = "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -\n"
+    str_s += "Tournees de collecte sale : \n"
+    for d_t in d_s["sales"]:
+        str_s += dict_tournee_to_txt(d_t, 3)
+    str_s += "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -\n"
+    str_s += "Plateformes : \n"
+    for d_p in d_s["plateformes"]:
+        str_s += dict_plateforme_to_txt(d_p, 3)
+    return str_s
+
+def dict_plateforme_to_txt(d_p:dict, indent:int):
+    str_p = ""
+    str_p += indent*" " + "- Plateforme "+str(d_p["numero"])+" avec "+str(d_p["xT"])+" trajet(s) directe(s) avec le transformateur, \n"
+    str_p += indent*" " + "   Clients affectes : "+str(d_p["cli_affect"])+"\n"
+    str_p += indent*" " + "   Points de prod visites : "+str(d_p["pt_affect"])+"\n"
+    str_p += indent*" " + "   Tournees de collecte (propres): \n"
+    for d_t in d_p["tournees"][0]:
+        str_p += dict_tournee_to_txt(d_t, indent + 5)
+    str_p += indent*" " + "   Tournees de livraison: \n"
+    for d_t in d_p["tournees"][1]:
+        str_p += dict_tournee_to_txt(d_t, indent + 5)
+    return str_p
+
+def dict_tournee_to_txt(d_t:dict, indent:int):
+    return indent*" " + "- Qt transportee : "+str(d_t["load"])+", "+str(d_t["size"])+" points visites : "+str(d_t["order"])+"\n"

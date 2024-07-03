@@ -305,7 +305,7 @@ def N3_intra_rand(x:Solution, entry:list = [-2,-2,-2,[[-2,-2],-2]]):
     if entry[0] == -2:
         i = rd.randint(0,len(x.plat))
         if i == 0:
-            e[0] = -2
+            e[0] = -1
         else:
             e[0] = i-1
     else:
@@ -385,8 +385,6 @@ def N3_intra_rand(x:Solution, entry:list = [-2,-2,-2,[[-2,-2],-2]]):
 #   indexes_affect : ([index_debut seq, index_fin seq], index où inserer seq dans t2)
 # ]
 def N3_inter_rand(x:Solution, entry:list = [-2,-2,[-2,-2],[[-2,-2],-2]]):
-    
-
     e = [-2,-2,[-2,-2],[[-2,-2],-2]]
 
     if entry[0] == -2:
