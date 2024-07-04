@@ -7,7 +7,7 @@ from .algorithm.GVNS import GVNS
 from .benchmark import *
 from src.resolution.pre_resolve import reduction
 
-def control(path:str,inst:Instance, nb_calc : int = 40, nb_perturb:int = 1):
+def control(path:str,inst:Instance, nb_calc : int = 400000, nb_perturb:int = 30):
 
     #Reduction du problème aux sommets concernées
     sub_data,indexes = reduction(inst)

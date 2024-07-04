@@ -8,12 +8,12 @@ def all_bar_obj(obj:list,pre_obj:list, calc_bool:list, names:list):
 
     for i in range(len(obj)):
         if calc_bool[i]:
-            it = str(i+1)
+            it = "x"+str(i+1)
             labels[0].append("b"+str(i+1))
             labels[0].append("a"+str(i+1))
 
         else:
-            it = "x"+str(i+1)
+            it = str(i+1)
             labels[0].append("xb"+str(i+1))
             labels[0].append("xa"+str(i+1))
         
@@ -139,7 +139,7 @@ def plot_time(time:list,calc_bool:list, name:str):
             not_finished[0].append(time[i])
             not_finished[1].append(i)
     #print(best_time)
-    ax.scatter(finished[1],finished[0], marker = 'o', color = "red", label = "RL interrompu")
+    ax.scatter(finished[1],finished[0], marker = 'o', color = "red", label = "RL terminée")
     ax.scatter(not_finished[1],not_finished[0], marker = 'x', color = "black", label = "RL inachevée")
     ax.plot(list(range(len(time))),time, color = "blue")
     ax.plot(list(range(len(time))),best_time, color = "red")
