@@ -41,8 +41,11 @@ class Sub_data :
             if(i in ind[0]):
                 self.locations.append((df.E.iloc[i]["x"],df.E.loc[i]["y"]))
 
+        print(df.F)
+        print(ind[1])
         for i in range(df.F.shape[0]):
             if(i in ind[1]):
+                print(i)
                 self.locations.append((df.F.iloc[i]["x"],df.F.loc[i]["y"]))
 
         for i in range(df.T.shape[0]):

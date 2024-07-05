@@ -3,3 +3,6 @@ out/*
 src/__pycache__
 src/scripts/__pycache__
 src/entity/__pycache__
+src/entity/instance/__pycache__
+src/resolution/algorithm/__pycache__
+.ipynb_checkpoints

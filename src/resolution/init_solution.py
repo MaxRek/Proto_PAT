@@ -8,9 +8,7 @@ import numpy as np
 from random import choice
 
 def init_solution(data : Sub_data):
-    
     s = Solution()
-
     # print(data.N)
     # print(data.C)
     # print(data.P)

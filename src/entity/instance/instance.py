@@ -3,11 +3,7 @@ from .data import Data
 import numpy as np
 import os
 import json
-from src.scripts.demandFiller import demandFiller_Dcpf
-from src.scripts.prodFiller import prodFiller
-
 from src.constant import PATH_IN,PATH_INSTANCE, FIELDS_E,SUB_DEMAND
-import pandas as pd
 
 class Instance:
     prod:dict

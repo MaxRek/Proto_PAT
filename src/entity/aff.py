@@ -1,7 +1,4 @@
 import folium
-import json
-from .etablissement import Etablissement
-from .fournisseur import Fournisseur
 from .df import Df
 from src.constant import ZOOM, LOC_BRIERE
 
@@ -25,7 +22,7 @@ class Aff:
     df:Df
 
     def __init__(self, loc:tuple=LOC_BRIERE, z_st:float=ZOOM):
-        self.F = list[Fournisseur]
+        self.F = []
         self.location = loc
         self.z_start = z_st
         self.df = Df()
