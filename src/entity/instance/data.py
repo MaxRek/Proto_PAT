@@ -1,14 +1,7 @@
-import numpy as np
-import openrouteservice
-import csv
 import os
-import requests
-import time
 import pandas as pd 
-from openrouteservice import convert
 from ..df import Df
-from src.constant import CONSOMMATION_VEHICULE ,APIKEY_OPENROUTE, PATH_IN, PATH_INSTANCE, PRIX_ESSENCE, TARIF_HORAIRE_HT, FIELDS_D
-import math
+from src.constant import PATH_IN, PATH_INSTANCE, FIELDS_D, NAME_CSV_E, NAME_CSV_F, NAME_CSV_N, NAME_CSV_T
 import ast
 
 class Data:
@@ -16,57 +9,86 @@ class Data:
     C:int
     P:int
     T:int
-    K:int
     F:int
     Fs:int
     Fp:int
     Q:int
     O:list
-    D:list
     d:dict
     c:list
+    time:list
     df:Df
 
-    def __init__(self, df:Df, n:int,c:int,p:int,t:int,k:int,f:int,fp:int,fs:int,q:int,o:list,D:list,d:dict,ct:list) -> None:
+    def __init__(self) -> None:
         # if len(o) != n and len(d) != c and len(d[0]) != f and len(S) != p and len(t) != n and len(t[0]) != fs and fp < fs :
-            self.df = df
-            self.N = n
-            self.C = c
-            self.P = p
-            self.T = t
-            self.K = k
-            self.F = f
-            self.Fs = fs
-            self.Fp = fp
-            self.Q = q
-            self.O = o
-            self.D = D
-            self.d = d
-            self.c = ct
+            self.df = Df()
+            self.N = 0
+            self.C = 0
+            self.P = 0
+            self.T = 0
+            self.F = 0
+            self.Fs = 0
+            self.Fp = 0
+            self.Q = 0
+            self.O = []
+            self.d = {}
+            self.c = []
+            self.time = []
         # else:
         #     print("Erreur d'initialisation, problème impossible")
         
+    def set_all_data(self, df:Df, n:int,c:int,p:int,t:int,f:int,fp:int,fs:int,q:int,o:list,D:list,d:dict,ct:list, time:list):
+        self.N = n
+        self.C = c
+        self.P = p
+        self.T = t
+        self.F = f
+        self.Fs = fs
+        self.Fp = fp
+        self.Q = q
+        self.O = o
+        self.d = d
+        self.c = ct
+        self.df = df
+        self.time = time
+
+
     def save_data(self, path, name):
         writer = open(path+name+"/data.txt",'w')
-        writer.write("N:"+str(self.N)+"\n")
-        writer.write("C:"+str(self.C)+"\n")
-        writer.write("P:"+str(self.P)+"\n")
-        writer.write("T:"+str(self.T)+"\n")
-        writer.write("K:"+str(self.K)+"\n")
-        writer.write("F:"+str(self.F)+"\n")
-        writer.write("Fs:"+str(self.Fs)+"\n")
-        writer.write("Fp:"+str(self.Fp)+"\n")
-        writer.write("Q:"+str(self.Q)+"\n")
-        writer.write("O:"+str(self.O)+"\n")
-        writer.write("D:"+str(self.D)+"\n")
-        writer.write("c:"+str(self.c)+"\n")
+        if self.N > 0 :
+            writer.write("N:"+str(self.N)+"\n")
+        if self.C > 0 :
+            writer.write("C:"+str(self.C)+"\n")
+        if self.P > 0 :
+            writer.write("P:"+str(self.P)+"\n")
+        if self.T > 0 :
+            writer.write("T:"+str(self.T)+"\n")
+        if self.F > 0 :
+            writer.write("F:"+str(self.F)+"\n")
+        if self.Fs > 0 :
+            writer.write("Fs:"+str(self.Fs)+"\n")
+        if self.Fp > 0 :
+            writer.write("Fp:"+str(self.Fp)+"\n")
+        if self.Q > 0 :
+            writer.write("Q:"+str(self.Q)+"\n")
+        if self.O != [] :
+            writer.write("O:"+str(self.O)+"\n")
+        if self.c != [] :
+            writer.write("c:"+str(self.c)+"\n")
+        if self.time != [] :
+            writer.write("time:"+str(self.time)+"\n")
         writer.close()
-        self.df.save_df(path+name+"/","e","f","n","t")
-        self.save_d(name, "d")
+        #self.df.save_df(path+name+"/","e","f","n","t")
+        #self.save_d(name, "d")
 
-    def load_data(self,path,name):
+    def load_data(self,name,path = PATH_IN+"/"+PATH_INSTANCE):
+        self.load_data_txt(name,path)
+        self.load_d("d",path+"/"+name)
+        self.df.load_csv(path+"/"+name, e_name= NAME_CSV_E, f_name= NAME_CSV_F, n_name=NAME_CSV_N,t_name=NAME_CSV_T)
+
+    def load_data_txt(self,name,path = PATH_IN+"/"+PATH_INSTANCE):
         if "data.txt" in os.listdir(path+"/"+name+"/"):
-            read = open(PATH_IN+"/"+PATH_INSTANCE+"/"+name+"/data.txt",'r')
+            read = open(path+"/"+name+"/data.txt",'r')
             lines = read.readlines()
             read.close()
             for i in lines:
@@ -82,9 +104,6 @@ class Data:
                 elif "T:" in i:
                     t = i[2:]
                     self.T = int(t)
-                elif "K:" in i:
-                    k = i[2:]
-                    self.K = int(k)
                 elif "F:" in i:
                     f = i[2:]
                     self.F = int(f)
@@ -103,24 +122,21 @@ class Data:
                 elif "d:" in i:
                     d = i[2:]
                     self.d = ast.literal_eval(d)
-                elif "D:" in i:
-                    D = i[2:]
-                    self.D = ast.literal_eval(D)
                 elif "c:" in i:
                     c = i[2:]
                     self.c = ast.literal_eval(c)
+                elif "time:" in i:
+                    t = i[5:]
+                    self.t = ast.literal_eval(t)
                 else:
                     print("Ligne supplémentaire sans indication : "+i)
-            self.load_Dd(name,"d",path)
         else:
             print("ERREUR : data.txt absent dans "+PATH_IN+"/"+PATH_INSTANCE+"/"+name+"/")
-
-    def load_Dd(self,name:str, file_d:str, path:str = PATH_IN+"/"+PATH_INSTANCE+"/"):
-        if file_d+".csv" in os.listdir(path+name+"/"):
+    def load_d(self, file_d:str, path:str = PATH_IN+"/"+PATH_INSTANCE+"/"):
+        if file_d+".csv" in os.listdir(path+"/"):
             self.d = {}
-            temp_d = pd.read_csv(path+name+"/"+file_d+".csv", sep=";", usecols= FIELDS_D)
-            self.D = np.zeros((self.C,self.P),dtype=int).tolist()
-            #print("C = "+str(self.C)+", Taille D : "+str(len(self.D))+ " " + str(len(self.D[0])))
+            temp_d = pd.read_csv(path+"/"+file_d+".csv", sep=";", usecols= FIELDS_D)
+            # print("C = "+str(self.C))
             # print(str(self.C) + " " + str(self.P))
             # print(str(temp_d.shape[0]) + " " + str(temp_d.shape[1]))
             if temp_d.shape[0] > 0:
@@ -132,12 +148,9 @@ class Data:
                     if r["P"] not in self.d[r["E"]].keys():
                         self.d[r["E"]][r["P"]] = []
                         #print("r[E] = "+ str(r["E"]), ", r[P] = "+ str(r["P"]))
-                        #print(self.D[45][11])
                     self.d[int(r["E"])][int(r["P"])].append((int(r["F"]),r["d"]))
-                    self.D[int(r["E"])][int(r["P"])] = 1
-            #print(self.D)   
         else:
-            print("Pas de fichier \""+file_d+".csv\" dans "+path+"/"+name)
+            print("Pas de fichier \""+file_d+".csv\" dans "+path+"/")
 
     def save_d(self,name:str, file_d:str, path:str = PATH_IN+"/"+PATH_INSTANCE+"/"):
         # if file_d+".csv" in os.listdir(path+name+"/"):
@@ -162,122 +175,4 @@ class Data:
                 for value in self.d[key][key2]:
                     string += "(Filière n"+str(value[0])+", qté = "+str(value[1])+")"
                 print("   Fournisseur n"+str(key2)+" filières : "+string )
-    
-    def gen_c(self,key=APIKEY_OPENROUTE,rate_per_hour:float=1.0):
-        total = self.N+self.C+self.P+1
-        self.c = np.zeros((total,total)).tolist()
-        it = math.ceil(total/25)
-        nbit = (it-1)+((it-2)*(it-1))/2
-        print("Usage d'OpenRouteServices : total du nombre de sommets = "+str(total)+", nombre de demandes = " + str(nbit))
-        print("Temps d'attente estimé : "+str(math.floor(nbit/40))+" min minimum")
-        temp_coords = []
-        test =0
-        for i in self.df.get_coords_N().values:
-            temp_coords.append((i[0],i[1]))
-
-        for i in self.df.get_coords_E().values:
-            temp_coords.append((i[0],i[1]))
-
-        for i in self.df.get_coords_F().values:
-            temp_coords.append((i[0],i[1]))
-
-        for i in self.df.get_coords_T().values:
-            temp_coords.append((i[0],i[1]))
-
-        it = math.ceil(total/25)
-        #Besoin d'ajouter un compteur à cause de la limite de temps imposé par OpenRouteService
-        lim = 0
-        for i in range(0,it-1):
-            for j in range(i+1,it):
-                test +=1
-                coords = []
-                i_coords = []
-                i_l = i*25
-                for l in temp_coords[i*25:min((i+1)*25,total)]:
-                    coords.append(l)
-                    i_coords.append(i_l)
-                    i_l += 1
-                i_k = j*25
-                for k in temp_coords[j*25:min((j+1)*25,total)]:
-                    coords.append(k)
-                    i_coords.append(i_k)
-                    i_k += 1
-
-                # print(str(i) + " " + str(j))
-                # print(range(i*25,min((i+1)*25,total)))
-                # print(range(j*25,min((j+1)*25,total)))
-                # print(i_coords)
-                #Requête auprès de OpenRouteServices, on incrémente notre limite, sinon on attend et réinitialise
-                if(lim < 40):
-                    lim += 1
-                else:
-                    print("Limite atteinte, éxécution en pause")
-                    time.sleep(60)
-                    print("Reprise d'éxécution")
-                    lim = 0
-                
-                temp_durations = request_c(coords,key)
-                if type(temp_durations) == list:
-                    for m in range(len(temp_durations)):
-                        for n in range(len(temp_durations[i])):
-                            self.c[i_coords[m]][i_coords[n]] = temp_durations[m][n]
-                            self.c[i_coords[n]][i_coords[m]] = temp_durations[m][n]
-                else:
-                    print("erreur")
-                # for m in range(len(i_coords)):
-                #     for n in range(m+1,len(i_coords)):
-                #         self.c[i_coords[m]][i_coords[n]] = 1
-                #         self.c[i_coords[n]][i_coords[m]] = 1
-
-        
-        #cas impair, il y a un ensemble de points non reliés qui n'a pas été pris dans les itérations suivantes
-        # if it/2 == math.ceil(it/2):
-        #     coords = []
-        #     i_coords = []
-        #     i_l = i*25
-        #     for i in temp_coords[math.floor(it/2)*25:min((math.floor(it/2)+1)*25,total)]:
-        #         coords.append(i)
-        #         i_coords.append(i_l)
-        #         i_l += 1
-        #         #Requête auprès de OpenRouteServices
-        #         # temp_durations = request_c(coords,key)
-        #         # for i in range(len(temp_durations)):
-        #         #     for j in range(len(temp_durations[i])):
-        #         #         self.c[i_coords[i],i_coords[j]] = temp_durations[i][j]
-        #         #         self.c[i_coords[j]][i_coords[i]] = temp_durations[j][i]    
-        #         for m in range(len(i_coords)):
-        #             for n in range(m,len(i_coords)):
-        #                 self.c[i_coords[m]][i_coords[n]] = 1
-        #                 #self.c[i_coords[n]][i_coords[m]] = 1 
-        #     print("Last case : " + str(i_l))
-        #     print(range(i_l,min((i_l+25,total))))
-        #     print(i_coords)
-        
-        # print(type(self.c))
-        # print(test)
-
-def request_c(coords,key,consommation=CONSOMMATION_VEHICULE,tarif_horaire=TARIF_HORAIRE_HT, prix = PRIX_ESSENCE):
-    r = 0
-    try:
-        body = {"locations":coords,"metrics":["distance","duration"]}
-        headers = {
-            'Accept': 'application/json, application/geo+json, application/gpx+xml, img/png; charset=utf-8',
-            'Authorization': key,
-            'Content-Type': 'application/json; charset=utf-8'
-        }
-
-        call = requests.post('https://api.openrouteservice.org/v2/matrix/driving-car', json=body, headers=headers)
-        
-        durations = call.json()["durations"]
-        distances = call.json()["distances"]
-        r = np.zeros((len(durations),len(durations[0]))).tolist()
-        for i in range(len(durations)):
-            for j in range(len(durations[i])):
-                r[i][j]=math.ceil(durations[i][j]/60/60*tarif_horaire + distances[i][j]/100000*prix*consommation)
-
-    except:
-        print(call.status_code)
-        print(call.text)
-
-    return r
         

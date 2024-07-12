@@ -12,8 +12,6 @@ from src.constant import FIELDS_E
 from src.constant import FIELDS_N
 from src.constant import FIELDS_T
 
-
-
 class Aff:
     M:folium.Map
     location:tuple

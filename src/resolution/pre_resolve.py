@@ -9,7 +9,6 @@ def reduction(inst:Instance):
     indexes_loc = [[],[]]
     sub_tsp = []
 
-
     #Récupération des clients ayant passé commande
     indexes_loc[0] = list(inst.data.d.keys())
 
@@ -29,8 +28,8 @@ def reduction(inst:Instance):
            # for f in range(len(inst.data.d[i][j])):
     indexes_loc[0] = sorted(indexes_loc[0])
     indexes_loc[1] = sorted(indexes_loc[1])
-    # print(indexes_loc)
-    # print(sub_tsp)
+    print(indexes_loc)
+    print(sub_tsp)
 
 
     #Adaptation de D pour ne récupérer que les clients des producteurs visités
@@ -51,7 +50,7 @@ def reduction(inst:Instance):
             new_d[i_c][j_c] = []
             for k in inst.data.d[i][j]:
                 new_d[i_c][j_c].append(k)
-    
+
     #print(new_d)
 
     #adaptation de c pour réduire la matrice de coût uniquement à ceux qui nous intéressent

@@ -9,15 +9,16 @@ from random import choice
 
 def init_solution(data : Sub_data):
     s = Solution()
-    # print(data.N)
-    # print(data.C)
-    # print(data.P)
-    # print(data.T)
+    print(data.N)
+    print(data.C)
+    print(data.P)
+    print(data.T)
 
     s.plat.append(Plateforme(choice(list(range(data.N)))))
     s.add_client_to_plat(0,range(data.N,data.C),data.d)
     s.plat[0].calc_LnfPT_c(data.d, data.C, data.F, data.T,data.T, data.Q)
 
+    print(s.plat[0].Lfptn)
     sum_fs = np.zeros(data.F).tolist()
     for i in s.plat[0].Lfptn:
         for j in range(data.F):
@@ -34,8 +35,11 @@ def init_solution(data : Sub_data):
     #print(get_sum_qt_c_l_by_d(data.d, s.plat[0].cli_affect,data.F))
     s.init_CAW_lp(data.c, data.Q, data.d, data.F)
 
+    s.print_all_plateformes()
+
     #s.plat[0].print_plateforme()
-    s.verif_solution(data.C,data.N,data.Q)
+    if not s.verif_solution(data.C, data.N, data.Q):
+        s = False
     #print(s.calc_func_obj(data.O,data.c))
 
     return s

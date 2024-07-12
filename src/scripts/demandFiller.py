@@ -1,17 +1,20 @@
 import pandas as pd
+import requests
+import time
+from src.entity.instance.instance import Instance
 import numpy as np
 import math
 import copy
 import json
 import os
 import random
-from src.constant import COUT_METRE_CARRE,NB_METRE_CARRE,ECART_PRIX_PLAT,RATIO_AMORTISSEMENT,SUB_DEMAND,COMMUNES,DOMAINES,SUB_FIELDS_E,FIELDS_F,FIELDS_D
+from src.constant import NAME_CSV_F_GEN,NAME_CSV_E_GEN,PRIX_ESSENCE, TARIF_HORAIRE_HT, APIKEY_OPENROUTE, CONSOMMATION_VEHICULE,COUT_METRE_CARRE,NB_METRE_CARRE,ECART_PRIX_PLAT,RATIO_AMORTISSEMENT,SUB_DEMAND,COMMUNES,DOMAINES,SUB_FIELDS_E,FIELDS_F,FIELDS_D
 
 def rowDemandFiller(nbrp : int, quantities : list[int]) -> np.array:
     return nbrp*np.array(quantities)/100
 
-def demandFiller_Dcf(path : str, file : str, prod = SUB_DEMAND,mult:float=1.0):
-    datAll = pd.read_csv(path+file+".csv", sep = ";",na_values="NaN")
+def gen_E_Demand(path : str, file_e : str, prod = SUB_DEMAND,mult:float=1.0, nameFile = NAME_CSV_E_GEN):
+    datAll = pd.read_csv(path+file_e+".csv", sep = ";",na_values="NaN")
 
     #Nettoyage des données, concentration sur les Communes du PAT
     data = datAll.loc[datAll["Commune"].isin(COMMUNES)]
@@ -78,7 +81,13 @@ def demandFiller_Dcf(path : str, file : str, prod = SUB_DEMAND,mult:float=1.0):
     quantitySeries = demand.apply(lambda x : rowDemandFiller(x["Nombre de repas par jour"], quantities),axis=1)
     #quantityFrame = demand.apply(lambda x : rowDemandFiller(x["Nombre de repas par jour"], quantities),axis=1)
     demand[quantitiesNames] = 0
-    values = quantitySeries.values*mult/36
+
+    #Usage de mult pour donner l'échelle
+    values = []
+    for i in range(len(quantitySeries.values)):
+        values.append(quantitySeries.values[i])
+        for j in range(len(values[i])):
+            values[i][j] = values[i][j]*mult
 
     pos_SUB_DEMAND_key = []
     ind = 0
@@ -101,11 +110,150 @@ def demandFiller_Dcf(path : str, file : str, prod = SUB_DEMAND,mult:float=1.0):
         for j in range(len(values[i])):
             demand.iloc[i,j+len(SUB_FIELDS_E)] = values[i][j]
 
-    nameFile = file + "_demand"
+    
     if nameFile+".csv" in os.listdir(path):
         os.remove(path+nameFile+".csv")
     demand.to_csv(path+nameFile+".csv", sep=";")
 
+def genFill(path : str, file_p : str, fileName : str, multi_f:float, ratio_p:list, prod = SUB_DEMAND):
+    data_p = pd.read_csv(path+file_p+".csv", sep = ";",na_values="NaN")
+
+    data_p = data_p[FIELDS_F]
+    if(len(ratio_p) != len(list(prod.keys()))):
+        print("ratio_p n'est pas représentatif des filières à traiter (len(ratio_p) = "+str(len(ratio_p))+" , len(demand_key) = "+str(len(list(prod.keys())))+"), séparation égale pour chaque filière")
+        r = 1/len(list(prod.keys()))
+        ratio_p = np.ones(len(list(prod.keys()))).tolist()
+        for i in range(len(ratio_p)):
+            ratio_p[i] = ratio_p[i]*r
+
+    #print(ratio_p)
+    affect = []
+    k = 0
+    for row in data_p.iterrows():
+        stop = False
+        temp_l = list(range(len(list(prod.keys()))))
+        temp_r = copy.copy(ratio_p)
+        temp_f = []
+        ind_f = []
+        while not stop:
+            if temp_l != []:
+                i, pre_sum_r = randinlist(temp_l,temp_r)
+                # print("i = "+ str(i))
+                # print("pré sum_r = "+str(pre_sum_r))
+
+                temp_f.append(list(prod.keys())[i])
+                ind_f.append(temp_l[i])
+                temp_l.pop(i)
+                post_sum_r = pre_sum_r - temp_r[i]
+                # print("post sum_r = "+str(post_sum_r))
+
+                temp_r.pop(i)
+                for j in range(len(temp_r)):
+                    temp_r[j] = temp_r[j]*(pre_sum_r/post_sum_r)
+            else:
+                stop = True
+            if random.random() > multi_f :
+                stop = True
+        affect.append(str(temp_f))
+        # print(temp_f)
+        # print(ind_f)
+        # print(j)
+        k += 1
+
+    data_p["Filieres"] = affect
+    # print(data_p["Filieres"])
+    data_p.to_csv(path+fileName+".csv", sep = ";")
+
+def genDemand(path : str, file_d:str ,file_e_demand :str, file_p_fil:str, ratio_pc:list = [], prod:dict = SUB_DEMAND):
+    #Génération des commandes
+
+    if file_d+".csv" not in os.listdir(path):
+        pd.DataFrame([], columns=FIELDS_D).to_csv(path+file_d+".csv",sep=";")
+    d = pd.DataFrame([], columns=FIELDS_D).to_csv(path+file_d+".csv",sep=";")
+    demand = pd.read_csv(path+file_e_demand+".csv", sep= ";", usecols=list(prod.keys()))
+    fill = pd.read_csv(path+file_p_fil+".csv",sep=";")
+    
+    ind_f_p = []
+    for i in range(len(list(prod.keys()))):
+        ind_f_p.append([])
+
+    for i in range(fill.shape[0]):
+            j = 0
+        
+            for key in prod.keys():
+                #sum_ind_p_f.append[[]]
+                if key in fill.iloc[i]["Filieres"]:
+                    # print(key)
+                    # print(data_p.loc[i]["Filieres"])
+                    ind_f_p[j].append(i)
+                j += 1
+
+    if ratio_pc == []:
+        print("ratio_pc non spécifié, le client se fournit chez un producteur par filière")
+        ratio_pc = np.ones(len(list(prod.keys())),dtype=int).tolist()
+    #print(ind_f_p)
+
+    # print(values)
+    # print(demand["Legumes"])
+
+    #Pour chaque etablissement
+    for e in range(demand.shape[0]):
+        temp_ratio_pc = np.zeros(len(list(prod.keys())),dtype=int).tolist()
+        while(temp_ratio_pc != ratio_pc):
+        #On choisit une filière de produit
+            
+            f = randinlist(ratio_pc)
+            f = f[0]
+            #print("ratio_pc = "+str(ratio_pc)+" ,f = "+str(f))
+            temp_d = []
+            temp_f = []
+            temp_p = []
+
+            #verifier si il y a une demande pour le produit, et que la demande n'est pas déjà remplie
+            if demand.iloc[e][list(prod.keys())[f]] > 0 and temp_ratio_pc[f] < ratio_pc[f]:
+                #Ajoutez autant de prod que nécéssaire, coupez la commande en nombre de prods
+                #Relancez si prod déjà pris
+                while temp_ratio_pc[f] < ratio_pc[f]:
+                    #print(ind_f_p[f])
+                    
+                    k = randinlist(ind_f_p[f])[0]
+                    #print(k)
+                    if k not in temp_p :
+                        temp_p.append(ind_f_p[f][k])
+                        temp_ratio_pc[f] += 1
+                        temp_f.append(f)
+                        temp_d.append(demand.iloc[e][list(prod.keys())[f]]/ratio_pc[f])
+                        #print(temp_d)
+                        #On vérifie si le prod ne produit pas d'autres filières, si oui on associe directement s'il ya une place à remplir
+                        for j in range(len(ratio_pc)):
+                            if j != f:
+                                if(k in ind_f_p[j]) and temp_ratio_pc[j] < ratio_pc[j]:
+                                    #print(ind_f_p[j])
+                                    temp_p.append(ind_f_p[f][k])
+                                    temp_ratio_pc[j] += 1
+                                    temp_f.append(j)
+                                    temp_d.append(demand.iloc[e][list(prod.keys())[j]]/ratio_pc[j])
+                for i in range(len(temp_p)):
+                    # print("_________________")
+                    # print(data_p.loc[temp_p[i]])
+                    # print("_________________")  
+                    # print(list(prod.keys())[f])
+                    # print("_________________")
+                    # print(temp_f[i])
+
+                    values_ind = [e,temp_p[i],temp_f[i],temp_d[i]]
+                    r_ind = pd.DataFrame([values_ind] ,columns = ["E","P","F","d"])
+                    # values = [data_e.loc[e]["Nom de la structure"],data_p.loc[temp_p[i]]["Nom"],list(prod.keys())[f],temp_f[i]]
+
+                    # r = pd.DataFrame([values] ,columns = ["E","P","F","d"])
+                    d = pd.concat([d,r_ind], ignore_index=True)
+                
+                # d = pd.concat([r,d], ignore_index=True)
+
+    #print(d["d"].loc[d["F"] == 0])
+
+    #print(demand.iloc[e])
+    d.to_csv(path+file_d+".csv",sep=";")
 
 def demandFiller_Dcpf(path : str, file_e : str, file_p : str, file_d : str,mult:float=1, prod = SUB_DEMAND, D :list = [], multi_f = 0, ratio_p = [], ratio_pc = []):
     datAll = pd.read_csv(path+file_e+".csv", sep = ";",na_values="NaN")
@@ -304,7 +452,7 @@ def demandFiller_Dcpf(path : str, file_e : str, file_p : str, file_d : str,mult:
         print("ratio_pc non spécifié, le client se fournit chez un producteur par filière")
         ratio_pc = np.ones(len(pos_SUB_DEMAND_key),dtype=int).tolist()
     #print(ind_f_p)
-
+    print(ratio_pc)
     # print(values)
     # print(demand["Legumes"])
 
@@ -402,3 +550,97 @@ def gen_O(N:int,prix_mc:float = COUT_METRE_CARRE,surface:int = NB_METRE_CARRE,ec
 
     #print(r)
     return r
+
+def gen_c_time(inst:Instance,key=APIKEY_OPENROUTE,consommation=CONSOMMATION_VEHICULE,tarif_horaire=TARIF_HORAIRE_HT, prix = PRIX_ESSENCE):
+    done = True
+    total = inst.data.N+inst.data.C+inst.data.P+inst.data.T
+    inst.data.c = np.zeros((total,total)).tolist()
+    inst.data.time = np.zeros((total, total)).tolist()
+    it = math.ceil(total/25)
+    nbit = (it-1)+((it-2)*(it-1))/2
+    print("Usage d'OpenRouteServices : total du nombre de sommets = "+str(total)+", nombre de demandes = " + str(nbit))
+    print("Temps d'attente estimé : "+str(math.floor(nbit/40))+" min minimum")
+    temp_coords = []
+    test =0
+
+    for i in inst.data.df.get_coords_N().values:
+        temp_coords.append((i[0],i[1]))
+    for i in inst.data.df.get_coords_E().values:
+        temp_coords.append((i[0],i[1]))
+
+
+
+    for i in inst.data.df.get_coords_F().values:
+        temp_coords.append((i[0],i[1]))
+
+    for i in inst.data.df.get_coords_T().values:
+        temp_coords.append((i[0],i[1]))
+
+    it = math.ceil(total/25)
+    #Besoin d'ajouter un compteur à cause de la limite de temps imposé par OpenRouteService
+    lim = 0
+    for i in range(0,it-1):
+        for j in range(i+1,it):
+            test +=1
+            coords = []
+            i_coords = []
+            i_l = i*25
+            for l in temp_coords[i*25:min((i+1)*25,total)]:
+                coords.append(l)
+                i_coords.append(i_l)
+                i_l += 1
+            i_k = j*25
+            for k in temp_coords[j*25:min((j+1)*25,total)]:
+                coords.append(k)
+                i_coords.append(i_k)
+                i_k += 1
+
+            #Requête auprès de OpenRouteServices, on incrémente notre limite, sinon on attend et réinitialise
+            if(lim < 40):
+                lim += 1
+            else:
+                print("Limite atteinte, éxécution en pause")
+                time.sleep(60)
+                print("Reprise d'éxécution")
+                lim = 0
+            
+            temp_costs, temp_times = request_c_time(coords,key,consommation,tarif_horaire,prix)
+            if type(temp_costs) == list:
+                for m in range(len(temp_costs)):
+                    for n in range(len(temp_costs[i])):
+                        inst.data.c[i_coords[m]][i_coords[n]] = temp_costs[m][n]
+                        inst.data.c[i_coords[n]][i_coords[m]] = temp_costs[m][n]
+                        inst.data.time[i_coords[m]][i_coords[n]] = temp_times[m][n]
+                        inst.data.time[i_coords[n]][i_coords[m]] = temp_times[m][n]
+
+            else:
+                print("erreur")
+                done = False
+    return done
+
+def request_c_time(coords,key,consommation=CONSOMMATION_VEHICULE,tarif_horaire=TARIF_HORAIRE_HT, prix = PRIX_ESSENCE):
+    r = 0
+    try:
+        body = {"locations":coords,"metrics":["distance","duration"]}
+        headers = {
+            'Accept': 'application/json, application/geo+json, application/gpx+xml, img/png; charset=utf-8',
+            'Authorization': key,
+            'Content-Type': 'application/json; charset=utf-8'
+        }
+
+        call = requests.post('https://api.openrouteservice.org/v2/matrix/driving-car', json=body, headers=headers)
+        
+        durations = call.json()["durations"]
+        distances = call.json()["distances"]
+        r = np.zeros((len(durations),len(durations[0]))).tolist()
+        rtime = np.zeros((len(durations),len(durations[0]))).tolist()
+        for i in range(len(durations)):
+            for j in range(len(durations[i])):
+                r[i][j]=math.ceil(durations[i][j]/60/60*tarif_horaire + distances[i][j]/100000*prix*consommation)
+                rtime[i][j] = math.ceil(durations[i][j]/60)
+        
+    except:
+        print(call.status_code)
+        print(call.text)
+
+    return r,rtime
