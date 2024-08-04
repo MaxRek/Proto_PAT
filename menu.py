@@ -13,9 +13,9 @@ from copy import deepcopy
 def control_verif_instance():
     print("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -")
     print("               Projet Alimentaire Territoriale - Presqu'île, Brière, Estuaires")
-    print("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -\n")
+    print("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -")
     print("                   Contrôleur des instances utilisées pour la résolution")
-    print("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -\n")
+    print("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -")
 
     stop = False
 
@@ -49,7 +49,6 @@ def control_verif_instance():
                     control_gen_tab(path, flags_tab, inst)
                     
                     flags_data = inst.check_data()
-                    print("----------------")
                     print(flags_data)
                     if flags_data != 0:
                         if flags_data != []:    

@@ -40,7 +40,7 @@ class Solution:
             temp_LnfPT = reduct_LnfPT(p.Lfptn,C)
             temp_pt = p.verif_all_pt_visited()
             if temp_pt[0]: 
-                if sorted(p.pt_affect) == sorted(temp_LnfPT[0]) and sorted(temp_LnfPT[0]) == sorted(temp_pt[1]):
+                if sorted(temp_LnfPT[0]) == sorted(temp_pt[1]):
                     if sum(temp_LnfPT[1]) == sum(temp_pt[2]):
                         temp_c = p.verif_all_c_visited()
                         if temp_c[0]:
@@ -70,16 +70,15 @@ class Solution:
                         b = False
                 else:
                     print("Erreur : Les points de collecte à visiter par la plateforme != points de collecte visités par les tournées != points de collecte affectés à la plateforme")
-                    print(temp_LnfPT[0])
-                    print(p.pt_affect)
-                    print(temp_pt[1])
-                    print(sorted(temp_LnfPT[0]))
-                    print(sorted(p.pt_affect))
-                    print(sorted(temp_pt[1]))
+                    print("Methode reduced_Lfnpt : \n" + str(sorted(temp_LnfPT[0])))
+                    print("Points affectés à la plateforme : \n" + str(sorted(p.pt_affect)))
+                    print("Points visités dans toutes les tournées : \n" + str(sorted(temp_pt[1])))
                     b = False
             else:
                 print("Erreur : Un point de collecte est visité plusieurs fois par la plateforme "+str(p.numero))
                 b = False  
+        if b:
+            print("La solution est correcte")
         return b
     
     #Ajoute les visites manquantes de clients et de producteurs pour produits propres nécéssaires pour valider solution
@@ -91,7 +90,6 @@ class Solution:
             for c in p.cli_affect:
                 if c in unaffected_cli:
                     unaffected_cli.remove(c)
-
 
         if unaffected_cli != []:
             for c in unaffected_cli:

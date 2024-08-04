@@ -18,7 +18,22 @@ def init_solution(data : Sub_data):
     s.add_client_to_plat(0,range(data.N,data.C),data.d)
     s.plat[0].calc_LnfPT_c(data.d, data.C, data.F, data.T,data.T, data.Q)
 
+    to_del = []
+    for cli in data.d.keys():
+        for prod in data.d[cli].keys():
+            # for com in data.d[cli][prod]:
+            if prod not in to_del :
+                to_del.append(prod)
+    print("____________________\n")
+
+    print(sorted(to_del))
+
+    print("____________________\n")
     print(s.plat[0].Lfptn)
+    print("____________________\n")
+    for com in sorted(data.d.items()):
+        print(com)
+
     sum_fs = np.zeros(data.F).tolist()
     for i in s.plat[0].Lfptn:
         for j in range(data.F):

@@ -183,13 +183,20 @@ class Plateforme:
     def calc_LnfPT_c(self,d:dict, C:int, f:int, pt:int, T:int, Q:int):
         self.Lfptn = np.zeros((T-C,f)).tolist()
         sum_fs = 0
+        to_del = []
+
         for c in self.cli_affect:
             for prod in d[c].keys():
+                if prod not in to_del :
+                    to_del.append(prod)
                 for value in d[c][prod]:
                     if value[0] == 0:
                         sum_fs += value[1]
                     else:
+                        #print("affectation prod "+str(value[0])+" value : " + str(value[1]) + " ,Lnfpt[prod] : \npre  :" +str(self.Lfptn[prod-C]))
                         self.Lfptn[prod-C][value[0]] += value[1]
+                        #print("post :" + str(self.Lfptn[prod-C]))
+
         t = 0
         if sum_fs > 0:
             self.xT = math.floor(sum_fs/Q)
@@ -198,6 +205,10 @@ class Plateforme:
                 sum_fs = sum_fs - self.xT*Q
                 self.pt_affect.append(T-1)
             self.Lfptn[-1][0] = sum_fs
+        print("calc_lfnpt_c\n")
+        print(sorted(to_del))
+        print("calc_lfnpt_c end \n")
+
 
     def tournee_post_del_point(self,t_type:int, i:int):
         r = False

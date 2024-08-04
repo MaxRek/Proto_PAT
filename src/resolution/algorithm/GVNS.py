@@ -255,7 +255,7 @@ def VND(path, data:Sub_data, x : Solution, lim_calc:int, nb_perturb:int, benchma
                         xp = fonctions[k][0](temp[0],data,temp[1])
                     else:
                         xp = fonctions[k][1](temp[0],data,temp[1])
-                    
+                    xp.verif_solution(data.C, data.N, data.Q)
                     #Calcul de la fonc obj et si le voisin a une meilleure fonction objectif, remplacement par celui çi
                     obj_1 = xp.calc_func_obj(data.O,data.c)
                     if x.calc_func_obj(data.O,data.c) > obj_1:
