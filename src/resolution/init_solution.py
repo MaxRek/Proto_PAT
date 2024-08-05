@@ -14,47 +14,21 @@ def init_solution(data : Sub_data):
     print(data.P)
     print(data.T)
 
+    #Selection d'une plateforme au hasard pour commencer 
     s.plat.append(Plateforme(choice(list(range(data.N)))))
     s.add_client_to_plat(0,range(data.N,data.C),data.d)
     s.plat[0].calc_LnfPT_c(data.d, data.C, data.F, data.T,data.T, data.Q)
-
-    to_del = []
-    for cli in data.d.keys():
-        for prod in data.d[cli].keys():
-            # for com in data.d[cli][prod]:
-            if prod not in to_del :
-                to_del.append(prod)
-    print("____________________\n")
-
-    print(sorted(to_del))
-
-    print("____________________\n")
-    print(s.plat[0].Lfptn)
-    print("____________________\n")
-    for com in sorted(data.d.items()):
-        print(com)
-
-    sum_fs = np.zeros(data.F).tolist()
-    for i in s.plat[0].Lfptn:
-        for j in range(data.F):
-            sum_fs[j] += i[j]
-    #print(sum_fs)
-    #print(cumul_qt_PT_by_LnfPT(s.plat[0].Lfptn))
+    
+    #Initialisation des tournées
     temp = get_fs_prod_ind_qt(data.rev_d)
     s.init_CAW_sales(data.c, data.Q, data.T-1,temp[0],temp[1])
-    #s.print_all_plateformes()
-    #s.print_sales()
-    #print(get_p_cl_by_d(data.d, s.plat[0].cli_affect))
-    #print(s.plat[0].Lfptn)
     s.init_CAW_cp(data.c, data.Q, data.C)
-    #print(get_sum_qt_c_l_by_d(data.d, s.plat[0].cli_affect,data.F))
     s.init_CAW_lp(data.c, data.Q, data.d, data.F)
 
     s.print_all_plateformes()
 
-    #s.plat[0].print_plateforme()
+    #Si la solution n'est pas admissible, suppresion de la solution
     if not s.verif_solution(data.C, data.N, data.Q):
         s = False
-    #print(s.calc_func_obj(data.O,data.c))
 
     return s

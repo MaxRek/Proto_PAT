@@ -18,7 +18,7 @@ class Sub_data :
     c:list
     locations:list
 
-
+    #classe identique à Data, à l'exception de l'ajout de rev_d, un dictionnaire inversé par rapport à data.d 
     def __init__(self, n:int, C:int, p:int, f:int, tsp :list, Q:int, O:list ,D:list, d:dict, c:list, ind:list, df:Df) -> None:
         self.N = n
         self.C = C+self.N
@@ -33,6 +33,7 @@ class Sub_data :
         self.c = c
         self.index = ind
         self.locations = []
+        
         for i in range(df.N.shape[0]):
             self.locations.append((df.N.iloc[i]["x"],df.N.iloc[i]["y"]))
 

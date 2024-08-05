@@ -9,8 +9,8 @@ from src.entity.instance.instance import Instance
 
 #INSEREZ LE NOM DE L'INSTANCE ICI
 name = "didactic"
-budget_calc = 1
-nb_perm = 1
+budget_calc = 20000
+nb_perm = 30
 
 instance = Instance(name)
 

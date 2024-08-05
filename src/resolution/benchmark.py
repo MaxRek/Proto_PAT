@@ -45,9 +45,6 @@ def all_bar_obj(obj:list,pre_obj:list, calc_bool:list, names:list):
         xn[2].append(obj[i][1])
         On[2].append(obj[i][2])
 
-    titles = ["z pré/post RL","z pré RL","z post RL"]
-    #print(On)
-    #print(xn)
     for i in range(3):
         bar_obj([On[i],xn[i],xs[i]], labels[i], names[i], max_z)
     plot_obj(sum_obj,sum_pre_obj,calc_bool,names[3])

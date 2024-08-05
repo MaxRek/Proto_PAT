@@ -13,6 +13,7 @@ class Solution:
         self.sales = []
         self.plat = []
 
+    #Vérification si la solution est admissible
     def verif_solution(self,C:int, N:int,Q:float):
         b = True
         #Vérification que tous les clients soient affectés à une plateforme minimum
@@ -26,9 +27,11 @@ class Solution:
                     print("Erreur : client c"+str(c)+" affecté à au moins deux plateformes")
                     b = False
         
-        if ind_c== list(range(N,C)):
+        #Tous les clients sont affectés,
+        if ind_c == list(range(N,C)):
             a = 0
             # print("ok")
+        #Tous les clients ne sont pas affectés
         else:
             print("Tous les clients ne sont pas affectés : ")
             print(ind_c)
@@ -37,14 +40,21 @@ class Solution:
 
         #Pour chaque plateforme, vérification que les producteurs soient bien affectés + tournée de collecte propres
         for p in self.plat:
+            #Récupération des quantités/points à visiter pour les producteurs
             temp_LnfPT = reduct_LnfPT(p.Lfptn,C)
             temp_pt = p.verif_all_pt_visited()
+            #Pas de producteur visité en double
             if temp_pt[0]: 
+                #Pas de producteur manquants/supplémentaires à ceux affectés
                 if sorted(temp_LnfPT[0]) == sorted(temp_pt[1]):
+                    #Quantité à collecter non respectée
                     if sum(temp_LnfPT[1]) == sum(temp_pt[2]):
+                        #Récupération des quantités/points à visiter pour les clients
                         temp_c = p.verif_all_c_visited()
                         if temp_c[0]:
+                            #Pas de clients en double
                             if sorted(p.cli_affect) == sorted(temp_c[1]):
+                                #Quantité livrée inférieure/supérieure à celle collectée
                                 if (sum(temp_pt[2]) + p.xT*Q) != sum(temp_c[2]):
                                     print("Erreur : Somme des quantités livrés dans les tournées != somme quantités collectés")
                                     print("xT = "+ str(p.xT))
@@ -70,17 +80,21 @@ class Solution:
                         b = False
                 else:
                     print("Erreur : Les points de collecte à visiter par la plateforme != points de collecte visités par les tournées != points de collecte affectés à la plateforme")
-                    print("Methode reduced_Lfnpt : \n" + str(sorted(temp_LnfPT[0])))
                     print("Points affectés à la plateforme : \n" + str(sorted(p.pt_affect)))
                     print("Points visités dans toutes les tournées : \n" + str(sorted(temp_pt[1])))
                     b = False
             else:
                 print("Erreur : Un point de collecte est visité plusieurs fois par la plateforme "+str(p.numero))
+                print(sum(temp_LnfPT[1]))
+                print(sum(temp_pt[2]))
+                print(temp_LnfPT[1])
+                print(temp_pt[2])
                 b = False  
         if b:
             print("La solution est correcte")
         return b
     
+    # METHODE DEPRECIEE, NE PAS UTILISER
     #Ajoute les visites manquantes de clients et de producteurs pour produits propres nécéssaires pour valider solution
     #Se fait post affectation d'un client à une plateforme
     def repair_solution_post_N6(self, data):
@@ -98,11 +112,14 @@ class Solution:
         for p in self.plat:
             p.repair(data)
     
+    #calcul de la valeur objectif pour les plateformes et toutes les tournées (+ sales)
     def calc_func_obj(self,O:list, c:list):
         obj = 0
         sum_temp = [0,0]
+        #calcul obj pour chaque tournée sales
         for t in self.sales:
             obj += t.calc_obj_tournee(c)
+        #calcul obj pour chaque plateforme ouverte
         for p in self.plat:
             temp = p.calc_obj_plat_tournee(O,c)
             sum_temp[0] += temp[0]
@@ -110,18 +127,7 @@ class Solution:
 
         return [obj, sum_temp[1], sum_temp[0]]         
 
-    def init_CAW_sales(self, c:list, Q:float, T_ind:int, indexes:list, Q_ind:list):
-        self.sales = CAW_F(c, Q, T_ind,indexes, Q_ind)
-
-    def init_CAW_cp(self, c:list, Q:float, C:int):
-        for i in self.plat:
-            temp = reduct_LnfPT(i.Lfptn,C)
-            i.tournees[0] = CAW_F(c, Q, i.numero, temp[0], temp[1])
-
-    def init_CAW_lp(self, c:list, Q:float, d:dict, f:int):
-        for i in self.plat:
-            i.tournees[1] = CAW_F(c, Q, i.numero, i.cli_affect, get_sum_qt_c_l_by_d(d,i.cli_affect,f))
-    
+    #Ajout de client à une plateforme si elle est ouverte
     def add_client_to_plat(self,index:int, c_l:list, d:dict):
         if index >= 0 and index < len(self.plat):
             for c in c_l:
@@ -129,6 +135,22 @@ class Solution:
         elif index not in range(self.plat):
             print("Erreur : index inexistant dans Solution.plat : i = "+str(index)+", len = "+str(len(self.plat)))
     
+    #Initialisation : Clark and Wright pour produits sales
+    def init_CAW_sales(self, c:list, Q:float, T_ind:int, indexes:list, Q_ind:list):
+        self.sales = CAW_F(c, Q, T_ind,indexes, Q_ind)
+
+    #Initialisation : Clark and Wright pour collecte produits propres
+    def init_CAW_cp(self, c:list, Q:float, C:int):
+        for i in self.plat:
+            temp = reduct_LnfPT(i.Lfptn,C)
+            i.tournees[0] = CAW_F(c, Q, i.numero, temp[0], temp[1])
+
+    #Initialisation : Clark and Wright pour livraison produits propres
+    def init_CAW_lp(self, c:list, Q:float, d:dict, f:int):
+        for i in self.plat:
+            i.tournees[1] = CAW_F(c, Q, i.numero, i.cli_affect, get_sum_qt_c_l_by_d(d,i.cli_affect,f))
+    
+    #fonctions d'affichages/sauvegarde de la solution
     def print_sales(self, index:int = -1):
         if(index >= 0 and index < len(self.sales)):
             print(self.sales[index])

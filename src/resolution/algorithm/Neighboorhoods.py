@@ -19,27 +19,33 @@ from .CAW import CAW_F
 #   indexes_affect : (index_sommet à insérer, index_insertion du sommet)
 # ]
 def N1_intra(x:Solution, data:Sub_data, entry:list = [-2,-2,-2,[-2,-2]]):
-    #si index_plat non déterminé, assignation à une plat ouverte ou transf    
     if entry[0] == -2 or entry[1] == -2 or entry[2] == -2 or entry[3][0] == -2:
         e = N1_intra_rand(x,entry)
     else:
         e = copy.deepcopy(entry)
+    
     # print(entry)     
     # print(e)
 
     xp = copy.deepcopy(x)
 
-    #Dans le cadre de la collecte sale
+    #Tournées sales ou propres ?
     if e[0] == -1:
+        #récupération de la tournée puis modification dans la tournée
         t0 = xp.sales[e[2]]
         t0.reinsert(e[3][0],e[3][1])
+
         # x.sales[e[2]].print_tournee()
         # t0.print_tournee()
     else:
+        #récupération de la tournée puis modification dans la tournée
         t0 = xp.plat[e[0]].tournees[e[1]][e[2]]
         t0.reinsert(e[3][0],e[3][1])
+
         # x.plat[e[0]].tournees[e[1]][e[2]].print_tournee()
         # t0.print_tournee()
+
+    #Aucune vérification nécéssaire
 
     return xp
 
@@ -56,51 +62,64 @@ def N1_inter(x:Solution, data:Sub_data, entry = [-2,-2,[-2,-2],[-2,-2]]):
         e = N1_inter_rand(x,entry)
     else:
         e = copy.deepcopy(entry)
+
     # print(entry)     
     # print(e)
 
     xp = copy.deepcopy(x)
 
+    #Tournées sales ou propres ?
     if e[0] == -1:
-
+        # Selection des tournées
         t0 = xp.sales[e[2][0]]
         t1 = xp.sales[e[2][1]]
+
         # x.sales[e[2][0]].print_tournee()
         # x.sales[e[2][1]].print_tournee()
 
+        #Retrait du sommet de la première tournée puis ajout dans la seconde tournée
         s = t0.pop(e[3][0])
         t1.insert_sommet(s,e[3][1])
 
+        #Vérification 1 : tournée où sommet retiré est vide
         deleted = xp.sales[e[2][0]].size == 0
         if deleted:
             xp.sales.pop(e[2][0])
-        # print("La tournée a été supprimée : "+str(deleted))
+            # print("La tournée a été supprimée : "+str(deleted))
         
+        #Vérification 2 : Quantité à récupérer dans seconde tournée supérieur à capacité Q
+        #Récupération des quantités à récupérer
+        #Usage de méthode dédiée pour produits sales
         fs= get_fs_prod_ind_qt(data.rev_d)
 
+        #Calcul des nouvelles quantités pour les tournées
         if not deleted:
             t0.calc_load(fs)
             # t0.print_tournee()
+
         t1.calc_load(fs)
         # t1.print_tournee()
-        if(t0.load > data.Q or t1.load > data.Q):
+
+        #Si t1 dépasse quantité Q, retour à solution initiale 
+        if(t1.load > data.Q):
             #print("Insertion impossible pour points "+str(e[3])+" de tournée "+str(e[2][0])+" à "+str(e[2][1]))
             xp = x
     else:
+        # Selection des tournées
         t0 = xp.plat[e[0]].tournees[e[1]][e[2][0]]
         t1 = xp.plat[e[0]].tournees[e[1]][e[2][1]]
-        # x.plat[e[0]].tournees[e[1]][e[2][0]].print_tournee()
-        # x.plat[e[0]].tournees[e[1]][e[2][1]].print_tournee()
-        
+
         # t0.print_tournee()
         # t1.print_tournee()
+        
+        #Retrait du sommet de la première tournée puis ajout dans la seconde tournée
         s = t0.pop(e[3][0])
         t1.insert_sommet(s, e[3][1])
 
-        #Verifiez si la tounrée 0 n'est pas vide apres avoir pris un sommet
+        #Vérification 1 : tournée où sommet retiré est vide, méthode dédiée
         deleted = xp.plat[e[0]].tournee_post_del_point(e[1],e[2][0])
-        # print("La tournée a été supprimée : "+str(deleted))
-        
+
+        #Vérification 2 : Quantité à récupérer dans seconde tournée supérieure à capacité Q, calcul pour chaque cas
         if not deleted:
             if e[1] == 0: #Tournée de collecte
                 t0.calc_load(reduct_LnfPT(xp.plat[e[0]].Lfptn,data.C))
@@ -113,7 +132,7 @@ def N1_inter(x:Solution, data:Sub_data, entry = [-2,-2,[-2,-2],[-2,-2]]):
             t1.load = sum(get_sum_qt_c_l_by_d(data.d, t1.order,data.F))
         # t1.print_tournee()
         
-        
+        #Si t1 dépasse quantité Q, retour à solution initiale 
         if t1.load > data.Q:
             # print("Insertion impossible pour points "+str(e[3])+" de tournée "+str(e[2][0])+" à "+str(e[2][1]))
             xp = x
@@ -134,19 +153,25 @@ def N2_intra(x:Solution, data:Sub_data, entry = [-2,-2,-2,[-2,-2]]):
         e = N2_intra_rand(x,entry)
     else:
         e = copy.deepcopy(entry)
+    
     # print(entry)     
     # print(e)
 
     xp = copy.deepcopy(x)
 
+    #Tournées sales ou propres ?
     if e[0] == -1:
+        #récupération de la tournée puis modification dans la tournée
         t0 = xp.sales[e[2]]
         t0.swap_two_s_order(e[3][0],e[3][1])
+
         # x.sales[e[2]].print_tournee()
         # t0.print_tournee()
     else:
+        #récupération de la tournée puis modification dans la tournée
         t0 = xp.plat[e[0]].tournees[e[1]][e[2]]
         t0.reinsert(e[3][0],e[3][1])
+
         # x.plat[e[0]].tournees[e[1]][e[2]].print_tournee()
         # t0.print_tournee()
 
@@ -165,53 +190,56 @@ def N2_inter(x:Solution, data:Sub_data, entry = [-2,-2,[-2,-2],[-2,-2]]):
         e = N2_inter_rand(x,entry)
     else:
         e = copy.deepcopy(entry)
+
     # print(entry)     
     # print(e)
     
     xp = copy.deepcopy(x)
     
+    #Tournées sales ou propres ?
     if e[0] == -1:
+        # Selection des tournées
         t0 = xp.sales[e[2][0]]
         t1 = xp.sales[e[2][1]]
+        
         # t0.print_tournee()
         # t1.print_tournee()
 
+        #Modification des tournées
         temp = t0.order[e[3][0]]
         t0.order[e[3][0]] = t1.order[e[3][1]]
         t1.order[e[3][1]] = temp
 
+        #récupération infos puis calcul des quantités par tournée
         fs= get_fs_prod_ind_qt(data.rev_d)
         t0.calc_load(fs)
         t1.calc_load(fs)
     else:
+        # Selection des tournées
         t0 = xp.plat[e[0]].tournees[e[1]][e[2][0]]
         t1 = xp.plat[e[0]].tournees[e[1]][e[2][1]]
         # t0.print_tournee()
         # t1.print_tournee()
 
+        #Modification des tournées
         temp = t0.order[e[3][0]]
         t0.order[e[3][0]] = t1.order[e[3][1]]
         t1.order[e[3][1]] = temp
-
-        if e[1] == 0: #Tournée de collecte
+        
+        if e[1] == 0: #Tournée de collecte, usage de l'information déjà calculé dans l'objet Plateforme
             t0.calc_load(reduct_LnfPT(xp.plat[e[0]].Lfptn,data.C))
             t1.calc_load(reduct_LnfPT(xp.plat[e[0]].Lfptn,data.C))
-        else: #Tournée de livraison
+        else: #Tournée de livraison, usage méthode dédiée pour produits sales
             t0.load = sum(get_sum_qt_c_l_by_d(data.d, t0.order,data.F))
             t1.load = sum(get_sum_qt_c_l_by_d(data.d, t1.order,data.F))
 
     # t0.print_tournee()
     # t1.print_tournee()
-           
+
+    #Vérification des quantités des tournées
     if t0.load > data.Q or t1.load > data.Q:
         # print("Swap impossible pour points "+str(e[3])+" de tournée "+str(e[2][0])+" à "+str(e[2][1]))
         xp = x
-        # if(e[0] == -2):
-        #     xp.sales[e[2][0]].print_tournee()
-        #     xp.sales[e[2][1]].print_tournee()
-        # else:
-        #     xp.plat[e[0]].tournees[e[1]][e[2][0]].print_tournee()
-        #     xp.plat[e[0]].tournees[e[1]][e[2][1]].print_tournee()
 
     return xp
 
@@ -234,14 +262,17 @@ def N3_intra(x:Solution, data:Sub_data, entry = [-2,-2,-2,[[-2,-2],-2]]):
     xp = copy.deepcopy(x)
 
     if e[0] == -1:
+        #récupération de la tournée puis modification dans la tournée
         t0 = xp.sales[e[2]]
-
         t0.extended_or_opt(e[3][0], e[3][1])
+
         # x.sales[e[2]].print_tournee()
         # t0.print_tournee()
     else:
+        #récupération de la tournée puis modification dans la tournée
         t0 = xp.plat[e[0]].tournees[e[1]][e[2]]
         t0.extended_or_opt(e[3][0], e[3][1])
+
         # x.plat[e[0]].tournees[e[1]][e[2]].print_tournee()
         # t0.print_tournee()
     return xp
@@ -265,49 +296,57 @@ def N3_inter(x:Solution, data:Sub_data, entry = [-2,-2,[-2,-2],[[-2,-2],-2]]):
     xp = copy.deepcopy(x)
     
     if e[0] == -1:
+        # Selection des tournées
         t0 = xp.sales[e[2][0]]
         t1 = xp.sales[e[2][1]]
+
         # x.sales[e[2][0]].print_tournee()
         # x.sales[e[2][1]].print_tournee()
 
+        #Modification des tournées
         seq = t0.order[e[3][0][0]:e[3][0][1]]
         for i in range(e[3][0][1]-e[3][0][0]):
             t0.del_point(seq)
         t1.insert_seq_or_opt(list(reversed(seq)),e[3][1])
 
+        #Vérification 1 : tournée où sommet retiré est vide
         deleted = xp.sales[e[2][0]].size == 0
         if deleted:
             xp.sales.pop(e[2][0])
-        # print("La tournée a été supprimée : "+str(deleted))
-        
-        fs= get_fs_prod_ind_qt(data.rev_d)
-        t0.calc_load(fs)
-        
 
+        #Vérification 2 : Quantité à récupérer dans seconde tournée supérieur à capacité Q
+        #Récupération des quantités à récupérer
+        #Usage de méthode dédiée pour produits sales
+        fs= get_fs_prod_ind_qt(data.rev_d)        
+        
         if not deleted:
             t0.calc_load(fs)
             # t0.print_tournee()
         t1.calc_load(fs)
         # t1.print_tournee()
 
+        #Si t1 dépasse quantité Q, retour à solution initiale 
         if(t1.load > data.Q):
             # print("Insertion impossible pour points "+str(e[3])+" de tournée "+str(e[2][0])+" à "+str(e[2][1]))
             xp = x
     else:
+        # Selection des tournées
         t0 = xp.plat[e[0]].tournees[e[1]][e[2][0]]
         t1 = xp.plat[e[0]].tournees[e[1]][e[2][1]]
         # x.plat[e[0]].tournees[e[1]][e[2][0]].print_tournee()
         # x.plat[e[0]].tournees[e[1]][e[2][1]].print_tournee()
         
+        #Modification des tournées
         seq = t0.order[e[3][0][0]:e[3][0][1]]
         for i in range(e[3][0][1]-e[3][0][0]):
             t0.del_point(seq)
         t1.insert_seq_or_opt(list(reversed(seq)),e[3][1])
 
-        #Verifiez si la tounrée 0 n'est pas vide apres avoir pris un sommet
+        #Vérification 1 : tournée où sommet retiré est vide, méthode dédiée
         deleted = xp.plat[e[0]].tournee_post_del_point(e[1],e[2][0])
         # print("La tournée a été supprimée : "+str(deleted))
         
+        #Vérification 2 : Quantité à récupérer dans seconde tournée supérieure à capacité Q, calcul pour chaque cas
         if not deleted:
             if e[1] == 0: #Tournée de collecte
                 t0.calc_load(reduct_LnfPT(xp.plat[e[0]].Lfptn,data.C))
@@ -320,7 +359,7 @@ def N3_inter(x:Solution, data:Sub_data, entry = [-2,-2,[-2,-2],[[-2,-2],-2]]):
             t1.load = sum(get_sum_qt_c_l_by_d(data.d, t1.order,data.F))
         # t1.print_tournee()
         
-        
+        #Si t1 dépasse quantité Q, retour à solution initiale 
         if t1.load > data.Q:
             # print("Insertion impossible pour points "+str(e[3])+" de tournée "+str(e[2][0])+" à "+str(e[2][1]))
             xp = x
@@ -341,17 +380,20 @@ def N4_intra(x:Solution, data:Sub_data, entry = [-2,-2,-2,[[-2,-2],-2]]):
         e = N3_intra_rand(x,entry)
     else:
         e = copy.deepcopy(entry)
+    
     # print(entry)     
     # print(e)
 
     xp = copy.deepcopy(x)
 
     if e[0] == -1:
+        #récupération de la tournée puis modification dans la tournée
         t0 = xp.sales[e[2]]
         t0.inverse_or_opt(e[3][0], e[3][1])
         # x.sales[e[2]].print_tournee()
         # t0.print_tournee()
     else:
+        #récupération de la tournée puis modification dans la tournée
         t0 = xp.plat[e[0]].tournees[e[1]][e[2]]
         t0.inverse_or_opt(e[3][0], e[3][1])
         # x.plat[e[0]].tournees[e[1]][e[2]].print_tournee()
@@ -377,6 +419,7 @@ def N4_inter(x:Solution, data:Sub_data, entry = [-2,-2,[-2,-2],[[-2,-2],-2]]):
     xp = copy.deepcopy(x)
     
     if e[0] == -1:
+        # Selection des tournées
         t0 = xp.sales[e[2][0]]
         t1 = xp.sales[e[2][1]]
         # x.sales[e[2][0]].print_tournee()
@@ -387,11 +430,15 @@ def N4_inter(x:Solution, data:Sub_data, entry = [-2,-2,[-2,-2],[[-2,-2],-2]]):
             t0.del_point(seq)
         t1.insert_seq_or_opt(list(reversed(seq)),e[3][1])
 
+        #Vérification 1 : tournée où sommet retiré est vide
         deleted = xp.sales[e[2][0]].size == 0
         if deleted:
             xp.sales.pop(e[2][0])
         # print("La tournée a été supprimée : "+str(deleted))
         
+        #Vérification 2 : Quantité à récupérer dans seconde tournée supérieur à capacité Q
+        #Récupération des quantités à récupérer
+        #Usage de méthode dédiée pour produits sales
         fs= get_fs_prod_ind_qt(data.rev_d)
         t0.calc_load(fs)
 
@@ -401,10 +448,12 @@ def N4_inter(x:Solution, data:Sub_data, entry = [-2,-2,[-2,-2],[[-2,-2],-2]]):
         t1.calc_load(fs)
         # t1.print_tournee()
 
+        #Si t1 dépasse quantité Q, retour à solution initiale 
         if(t1.load > data.Q):
             # print("Insertion impossible pour points "+str(e[3])+" de tournée "+str(e[2][0])+" à "+str(e[2][1]))
             xp = x
     else:
+        # Selection des tournées
         t0 = xp.plat[e[0]].tournees[e[1]][e[2][0]]
         t1 = xp.plat[e[0]].tournees[e[1]][e[2][1]]
         # x.plat[e[0]].tournees[e[1]][e[2][0]].print_tournee()
@@ -420,6 +469,7 @@ def N4_inter(x:Solution, data:Sub_data, entry = [-2,-2,[-2,-2],[[-2,-2],-2]]):
         deleted = xp.plat[e[0]].tournee_post_del_point(e[1],e[2][0])
         # print("La tournée a été supprimée : "+str(deleted))
         
+        #Vérification 2 : Quantité à récupérer dans seconde tournée supérieure à capacité Q, calcul pour chaque cas
         if not deleted:
             if e[1] == 0: #Tournée de collecte
                 t0.calc_load(reduct_LnfPT(xp.plat[e[0]].Lfptn,data.C))
@@ -432,7 +482,7 @@ def N4_inter(x:Solution, data:Sub_data, entry = [-2,-2,[-2,-2],[[-2,-2],-2]]):
             t1.load = sum(get_sum_qt_c_l_by_d(data.d, t1.order,data.F))
         # t1.print_tournee()
         
-        
+        #Si t1 dépasse quantité Q, retour à solution initiale 
         if t1.load > data.Q:
             # print("Insertion impossible pour points "+str(e[3])+" de tournée "+str(e[2][0])+" à "+str(e[2][1]))
             xp = x
@@ -454,6 +504,7 @@ def N5_Add(x:Solution, data:Sub_data, entry = [-2]):
 
     xp = copy.deepcopy(x)
 
+    #Ajout d'une plateforme dans la solution, affectation des clients par la suite
     xp.plat.append(Plateforme(e[0]))
 
     return xp
@@ -473,11 +524,10 @@ def N5_Del(x:Solution, data:Sub_data, entry = [-2]):
     
     xp = copy.deepcopy(x)
 
-    # print("pré del")
-
+    #Supression d'une plateforme
     xp.plat.pop(e[0])
-    # print("post del")
 
+    #Réparation de la solution post supression
     xp.repair_solution_post_N6(data)
 
     # xp.print_plateforme(e[0])
@@ -503,11 +553,12 @@ def N5_Swap(x:Solution, data:Sub_data, entry = [-2,-2]):
 
     xp = copy.deepcopy(x)
     
+    #Modification de la plateforme selon le numéro (modifie aussi les tournées)
     xp.plat[e[0]].set_numero(e[1])
 
     return xp
 
-#REAFFECTATION CLIENT
+#REAFFECTATION CLIENT, METHODE DEPRECIEE, NE PAS UTILISER
 #entry = paramètre
 # [
 #   numero_client à réaffecter
@@ -526,15 +577,18 @@ def N6_one(x:Solution, data:Sub_data, entry = [-2,-2]):
     found = False
     i = 0
     
+    #Vérification, récupération de l'index de la plateforme où le client est affecté
     while not found and i < len(x.plat):
         if e[0] in x.plat[i].cli_affect:
             found = True
         else:
             i += 1
 
+    #Suppresion du client dans la plateforme d'origine et ajout dans la nouvelle
     xp.plat[i].cli_affect.remove(e[0])
     xp.plat[e[1]].add_client(data.d,e[0])
 
+    #Modification des LnfPT, puis réparation
     xp.plat[i].calc_LnfPT_c(data.d, data.C,data.F,data.T,data.T,data.Q)
     xp.plat[i].repair(data)
     if i != e[1]:
@@ -543,7 +597,7 @@ def N6_one(x:Solution, data:Sub_data, entry = [-2,-2]):
 
     return xp
 
-#REAFFECTATION LISTE DE CLIENTS
+#REAFFECTATION LISTE DE CLIENTS, METHODE DEPRECIEE, NE PAS UTILISER
 #entry = paramètre
 # [
 #   [liste de numero_client à réaffecter]
@@ -579,7 +633,7 @@ def N6_some(x:Solution, data:Sub_data, entry = [[-2],[-2]]):
 
     return xp
 
-#REAFFECTATION ALEATOIRE DE TOUS LES CLIENTS
+#REAFFECTATION ALEATOIRE DE TOUS LES CLIENTS, METHODE DEPRECIEE, NE PAS UTILISER
 def N6_all(x:Solution, data:Sub_data):
     xp = copy.deepcopy(x)
 
@@ -594,23 +648,28 @@ def N6_all(x:Solution, data:Sub_data):
     
     return xp
 
+#Réaffectation des clients à la plateforme la plus proche
 def N6_reaffect(x:Solution, data:Sub_data):
     xp = copy.deepcopy(x)
+    #Supression des infos enregistrés 
     for p in xp.plat:
         p.cli_affect.clear()
         p.pt_affect.clear()
         p.tournees[0].clear()
         p.tournees[1].clear()
 
+    #parcour pour affecter chaque client à la plateforme la plus proche
     for c in range(data.N,data.C):
         min_c = []
         for p in xp.plat:
             min_c.append(data.c[p.numero][c])
         xp.plat[min_c.index(min(min_c))].add_client(data.d,c)
 
+    #Calcul des quantités affectés à chaque plateformes
     for p in xp.plat:
         p.calc_LnfPT_c(data.d, data.C, data.F, data.T,data.T, data.Q)
-        
+
+    # # Construction des tournées selon Clark and Wright        
     # xp.init_CAW_cp(data.c, data.Q, data.C)
     # xp.init_CAW_lp(data.c, data.Q, data.d, data.F)
     # xp.init_CAW_cp(data.C, data.Q, data.C)

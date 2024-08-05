@@ -1,10 +1,9 @@
 from ..entity.instance.instance import Instance
 from .struct.sub_data import Sub_data
 from.tools import sub_matrix
-
-import math
 import numpy as np
 
+#Reduction de l'instance
 def reduction(inst:Instance):
     indexes_loc = [[],[]]
     sub_tsp = []
@@ -30,8 +29,7 @@ def reduction(inst:Instance):
     indexes_loc[1] = sorted(indexes_loc[1])
     print(indexes_loc)
     print(sub_tsp)
-
-
+    
     #Adaptation de D pour ne récupérer que les clients des producteurs visités
     #D_{p,c}
     sub_D = np.zeros((len(indexes_loc[1]),len(indexes_loc[0])),dtype=int).tolist()
@@ -51,11 +49,6 @@ def reduction(inst:Instance):
             for k in inst.data.d[i][j]:
                 new_d[i_c][j_c].append(k)
 
-    #print(new_d)
-
-    #adaptation de c pour réduire la matrice de coût uniquement à ceux qui nous intéressent
-    #c_{i,j} 
-
     #Rassemblement des indexes
     sum_ind = list(range(inst.data.N))
     for i in indexes_loc[0]:
@@ -65,11 +58,10 @@ def reduction(inst:Instance):
     
     sum_ind.append(inst.data.N+inst.data.C+inst.data.P)
 
-    #print(str(len(inst.data.c)) + " "+ str(len(inst.data.c[0])))
+    #adaptation de c pour réduire la matrice de coût uniquement à ceux qui nous intéressent
+    #c_{i,j} 
     sub_c = sub_matrix(inst.data.c, sum_ind)
-    #print(str(len(sub_c)) + " "+ str(len(sub_c)))
     
-
     sdata = Sub_data(inst.data.N,len(indexes_loc[0]),len(indexes_loc[1]),inst.data.F,sub_tsp, inst.data.Q, inst.data.O, sub_D, new_d, sub_c, indexes_loc, inst.data.df)
 
     # for i in i.data.d.keys():
