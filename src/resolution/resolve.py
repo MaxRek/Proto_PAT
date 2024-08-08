@@ -18,6 +18,8 @@ def control(path:str,inst:Instance, nb_calc : int = 400000, nb_perturb:int = 30)
     #print(s.soluce_to_dict())    
     if s != False:
         #Dossier pour benchmark, pour l'instance puis pour le test
+        if path not in os.listdir():
+            os.mkdir(path)
         if inst.name not in os.listdir(path):
             os.mkdir(path+"/"+inst.name)
         now = datetime.datetime.now()
